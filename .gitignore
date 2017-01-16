@@ -1,4 +1,8 @@
 #### joe made this: http://goel.io/joe
+
+# Common
+*.swp
+
 #### go ####
 # Compiled Object files, Static and Dynamic libs (Shared Objects)
 *.o
