@@ -38,23 +38,30 @@ func main() {
 	app.Action = func(ctx *cli.Context) {
 		username := ctx.String("username")
 		fmt.Println("username: ", username)
-		//TEST
-		if tag := ctx.String("tag"); tag == "go" {
-			fmt.Println("golang pages")
-		} else if tag == "python" {
-			fmt.Println("python pages")
-		}
+		/*
+			//TEST
+			if tag := ctx.String("tag"); tag == "go" {
+				fmt.Println("golang pages")
+			} else if tag == "python" {
+				fmt.Println("python pages")
+			}
 
-		us := NewUserStockAPI(username)
-		articles := us.Fetch()
-		fmt.Println("articles: ", articles)
+			us := NewUserStockAPI(username)
+			articles := us.Fetch()
+			fmt.Println("articles: ", articles)
+		*/
+		as := NewSampleArticles()
+		for _, a := range as {
+			// fmt.Println(a.ID, a.User, a.Title, a.Tags)
+			fmt.Println(a.ID, a.Tweet)
+		}
 
 		/*
 			TODO: make runnable structs
 				[X]: backend struct (has full api url, Fetch)
 				[X]: Fetch Articles
-				[]: Filter Articles with tag, title etc...
 				[]: Render with frontend struct
+				[]: Filter Articles with tag, title etc
 		*/
 
 		/*
