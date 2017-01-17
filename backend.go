@@ -38,13 +38,14 @@ func (us *UserStockAPI) fetch(url string) ([]Article, error) {
 
 	var articles []Article
 	if err := json.Unmarshal(body, &articles); err != nil {
-		return nil, fmt.Errorf("Unable to unmarshal response (%s): %v\nThe json body is: %s", url, err, string(body))
+		return nil, fmt.Errorf("Unable to unmarshal response (%s): %v\n", url, err)
+
 	}
 	return articles, nil
 }
 
+// Fetch (HTTP Access)
 func (us *UserStockAPI) Fetch() []Article {
-	// Fetch (HTTP Access)
 	articles, err := us.fetch(fmt.Sprintf(qiitaUserStockURI, us.UserName))
 	if err != nil {
 		log.Fatalf("Failed to fetch the user stock data: %v\n", err)

@@ -36,54 +36,54 @@ func main() {
 	}
 
 	app.Action = func(ctx *cli.Context) {
-		username := ctx.String("username")
-		fmt.Println("username: ", username)
-		/*
-			//TEST
-			if tag := ctx.String("tag"); tag == "go" {
-				fmt.Println("golang pages")
-			} else if tag == "python" {
-				fmt.Println("python pages")
-			}
-
-			us := NewUserStockAPI(username)
-			articles := us.Fetch()
-			fmt.Println("articles: ", articles)
-		*/
-		as := NewSampleArticles()
-		for _, a := range as {
-			// fmt.Println(a.ID, a.User, a.Title, a.Tags)
-			fmt.Println(a.ID, a.Tweet)
-		}
-
 		/*
 			TODO: make runnable structs
 				[X]: backend struct (has full api url, Fetch)
 				[X]: Fetch Articles
-				[]: Render with frontend struct
+				[X]: Render with frontend struct
+					[]: Complete
 				[]: Filter Articles with tag, title etc
 		*/
 
-		/*
-			// generate backend struct including full api url
-			us := NewUserStockAPI(username)  // us will implement
-			// fetch the url's api data and
-			// store the data as original struct type(articles, tags, users...etc)
-			arts := us.Fetch()
+		username := ctx.String("username")
+		// tag := ctx.String("tag")
+		// title := ctx.String("title")
 
-			// filter the articles according to specified tag and title name
-			// arts, err := arts.Filter(tag, title)  // TODO: the arguments should be capsuled
-			//if err != nil {
-			//	log.Fatalf("Error!")
-			//}
+		fmt.Println("username: ", username)
 
-			// select frontend type
-			fe, ok := getFrontEnd(ctx)
-			if !ok {
-				log.Fatalf("Not OK")
-			}
-			// render according to the articles data and frontend type
-			fe.Render(arts)
+		user_stock := NewUserStockAPI(username)
+		articles := user_stock.Fetch()
+		Render(articles)
+
+		/* // TEST NewTestArticles
+		as := NewTestArticles()
+		for _, a := range as {
+			// fmt.Println(a.ID, a.User, a.Title, a.Tags)
+			fmt.Println(a.ID, a.Tweet)
+		}
+		Render(as)
+		*/
+
+		/* Future Code
+		// generate backend struct including full api url
+		be := NewUserStockAPI(username)  // UserStockAPI implements Backend Interface
+		// fetch the url's api data and
+		// store the data as original struct type(articles, tags, users...etc)
+		arts := be.Fetch()
+
+		// filter the articles according to specified tag and title name
+		arts, err := arts.Filter(tag, title)  // TODO: the arguments should be capsuled
+		if err != nil {
+			log.Fatalf("Error!")
+		}
+
+		// select frontend type
+		fe, ok := NewCLIFontEnd(ctx)  // CLIFrontEnd implements FrontEnd Interface
+		if !ok {
+			log.Fatalf("Not OK")
+		}
+		render according to the articles data and frontend type
+		fe.Render(arts)
 		*/
 	}
 

@@ -11,44 +11,46 @@ type Article struct {
 	CreatedAtInWords string `json:"created_at_in_words"`
 	UpdatedAtInWords string `json:"updated_at_in_words"`
 	Tags             []Tag  `json:"tags"`
-	StockCount       int64  `json:"stock_count"`
-	StockUsers       []User `json:"stock_users"`
-	CommentCount     int64  `json:"comment_count"`
-	URL              string `json:"url"`
-	GistURL          string `json:"gist_url"`
-	Tweet            bool   `json:"tweet"`
-	Private          bool   `json:"private"`
-	Stocked          bool   `json:"stocked"`
+	StockCount       int    `json:"stock_count"`
+	// StockUsers       []User `json:"stock_users"` // Causion! StockUsers will be string type because json's StockUsers can be empty.
+	CommentCount int    `json:"comment_count"`
+	URL          string `json:"url"`
+	GistURL      string `json:"gist_url"`
+	Tweet        bool   `json:"tweet"`
+	Private      bool   `json:"private"`
+	Stocked      bool   `json:"stocked"`
 }
 
-func NewTestArticles(ID int64, User *User, Title string, Tags []Tag) *Article {
+func NewTestArticle(ID int64, User *User, Title string, Tags []Tag) Article {
 	UUID := "abcdefghijklmnopqrstuvwxyz"
 	a := Article{ID: ID, UUID: UUID,
 		User: *User, Title: Title, Tags: Tags}
-	return &a
+	return a
 }
 
-func NewSampleArticles() []*Article {
-	as := make([]*Article, 5)
-	as[0] = NewTestArticles(1, NewTestUser(), "title01", NewTestTags("python", "golang"))
-	as[1] = NewTestArticles(2, NewTestUser(), "title02", NewTestTags("golang", "oop"))
-	as[2] = NewTestArticles(3, NewTestUser(), "title03", NewTestTags("golang", "ddd"))
-	as[3] = NewTestArticles(4, NewTestUser(), "title04", NewTestTags("python", "cli"))
-	as[4] = NewTestArticles(5, NewTestUser(), "title05", NewTestTags("python", "golang"))
+func NewTestArticles() []Article {
+	as := make([]Article, 5)
+	as[0] = NewTestArticle(1, NewTestUser(), "title01", NewTestTags("python", "golang"))
+	as[1] = NewTestArticle(2, NewTestUser(), "title02", NewTestTags("golang", "oop"))
+	as[2] = NewTestArticle(3, NewTestUser(), "title03", NewTestTags("golang", "ddd"))
+	as[3] = NewTestArticle(4, NewTestUser(), "title04", NewTestTags("python", "cli"))
+	as[4] = NewTestArticle(5, NewTestUser(), "title05", NewTestTags("python", "golang"))
 	return as
 }
 
 type User struct {
-	Name            string `json:"name"`
+	ID              int    `json: "id"`
+	Following       bool   `json: "following"`
 	URLName         string `json:"url_name"`
 	ProfileImageURL string `json:"profile_image_url"`
 }
 
 func NewTestUser() *User {
-	Name := "john"
+	ID := 100
+	Following := false
 	URLName := "john_url"
 	ProfileImageURL := "https://qiita.com"
-	u := User{Name: Name, URLName: URLName, ProfileImageURL: ProfileImageURL}
+	u := User{ID: ID, Following: Following, URLName: URLName, ProfileImageURL: ProfileImageURL}
 	return &u
 }
 
