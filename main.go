@@ -1,7 +1,7 @@
 package main
 
 import (
-	// "fmt"
+	"fmt"
 	"os"
 
 	"github.com/urfave/cli"
@@ -36,45 +36,47 @@ func main() {
 	}
 
 	app.Action = func(ctx *cli.Context) {
-		/*TEST
 		username := ctx.String("username")
 		fmt.Println("username: ", username)
+		//TEST
 		if tag := ctx.String("tag"); tag == "go" {
 			fmt.Println("golang pages")
 		} else if tag == "python" {
 			fmt.Println("python pages")
 		}
-		*/
+
+		us := NewUserStockAPI(username)
+		articles := us.Fetch()
+		fmt.Println("articles: ", articles)
 
 		/*
 			TODO: make runnable structs
-				[]: backend struct (has full api url, Fetch)
-				[]: stock struct (future -> tag struct, user struct)
-				[]: frontend struct (has Render)
+				[X]: backend struct (has full api url, Fetch)
+				[X]: Fetch Articles
+				[]: Filter Articles with tag, title etc...
+				[]: Render with frontend struct
 		*/
 
 		/*
 			// generate backend struct including full api url
-			be, err := genBackEnd(ctx)
-			if err != nil {
-				log.Fatalf("Error!")
-			}
+			us := NewUserStockAPI(username)  // us will implement
 			// fetch the url's api data and
 			// store the data as original struct type(articles, tags, users...etc)
-			r := be.Fetch()
+			arts := us.Fetch()
+
 			// filter the articles according to specified tag and title name
-			err := r.filter(tag, title)
-			if err != nil {
-				log.Fatalf("Error!")
-			}
+			// arts, err := arts.Filter(tag, title)  // TODO: the arguments should be capsuled
+			//if err != nil {
+			//	log.Fatalf("Error!")
+			//}
 
 			// select frontend type
 			fe, ok := getFrontEnd(ctx)
 			if !ok {
 				log.Fatalf("Not OK")
 			}
-			// render according to the r data and frontend type
-			fe.Render(r)
+			// render according to the articles data and frontend type
+			fe.Render(arts)
 		*/
 	}
 
