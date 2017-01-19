@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	// "fmt"
 	"os"
 
 	"github.com/urfave/cli"
@@ -41,19 +41,19 @@ func main() {
 				[X]: backend struct (has full api url, Fetch)
 				[X]: Fetch Articles
 				[X]: Render with frontend struct
-					[]: Complete
+					[]: To Have Structs
 				[]: Filter Articles with tag, title etc
 		*/
 
+		// *** Main Start ***
 		username := ctx.String("username")
 		// tag := ctx.String("tag")
 		// title := ctx.String("title")
 
-		fmt.Println("username: ", username)
-
 		user_stock := NewUserStockAPI(username)
 		articles := user_stock.Fetch()
 		Render(articles)
+		// *** Main End ***
 
 		/* // TEST NewTestArticles
 		as := NewTestArticles()
@@ -64,11 +64,12 @@ func main() {
 		Render(as)
 		*/
 
-		// TEST MakeTurnedLines
+		/* // TEST MakeTurnedLines
 		generateTitleLines_strs_jp := MakeTurnedLines("python,golang", 61)
 		for _, line := range generateTitleLines_strs_jp {
 			fmt.Println(line)
 		}
+		*/
 
 		/* Future Code
 		// generate backend struct including full api url

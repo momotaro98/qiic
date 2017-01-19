@@ -73,7 +73,7 @@ func FindStringsMaxLen(lines_list [][]string) int {
 	return max_len
 }
 
-func GenerateArticleLines(art Article) (art_lines []string) {
+func GenerateArticleLines(art Article) []string {
 	// Title
 	title_lines := MakeTurnedLines(art.Title, max_title_half_len)
 
@@ -98,46 +98,70 @@ func GenerateArticleLines(art Article) (art_lines []string) {
 	tags_lines = MakeFullLines(tags_lines, max_tag_half_len, max_lines_len)
 	stock_lines = MakeFullLines(stock_lines, max_stock_half_len, max_lines_len)
 
-	/*
-		// DeBug
-		for _, title := range title_lines {
-			fmt.Println(title)
-		}
-		for _, tag := range tags_lines {
-			fmt.Println(tag)
-		}
-		for _, stock := range stock_lines {
-			fmt.Println(stock)
-		}
-	*/
-
-	art_lines = title_lines
+	// make ret lines
+	art_lines := make([]string, len(title_lines))
+	for i := 0; i < len(title_lines); i++ {
+		tit_line := title_lines[i]
+		tag_line := tags_lines[i]
+		sto_line := stock_lines[i]
+		a_lines_list := []string{tit_line, tag_line, sto_line}
+		art_lines[i] = "|" + strings.Join(a_lines_list, "|") + "|"
+	}
 	return art_lines
 }
 
+func GenerateTopBar() (ret string) {
+	title_line := strings.Repeat("─", max_title_half_len)
+	tags_line := strings.Repeat("─", max_tag_half_len)
+	stock_line := strings.Repeat("─", max_stock_half_len)
+	line_list := []string{title_line, tags_line, stock_line}
+	ret = "┌" + strings.Join(line_list, "┬") + "┐"
+	return
+}
+
+// util
+func CenterAligned(str string, max int) (ret string) {
+	rest_num := max - len(str)
+	ret = strings.Repeat(" ", rest_num/2) + str + strings.Repeat(" ", rest_num-rest_num/2)
+	return
+}
+
+func GenerateColumnBar() (ret string) {
+	title_line := CenterAligned("TITLE", max_title_half_len)
+	tags_line := CenterAligned("TAG", max_tag_half_len)
+	stock_line := CenterAligned("STOCK", max_stock_half_len)
+	line_list := []string{title_line, tags_line, stock_line}
+	ret = "|" + strings.Join(line_list, "|") + "|"
+	return
+}
+
+func GenerateSeperateBar() (ret string) {
+	title_line := strings.Repeat("─", max_title_half_len)
+	tags_line := strings.Repeat("─", max_tag_half_len)
+	stock_line := strings.Repeat("─", max_stock_half_len)
+	line_list := []string{title_line, tags_line, stock_line}
+	ret = "|" + strings.Join(line_list, "|") + "|"
+	return
+}
+
 func Render(arts []Article) {
-	// Print Header
-	// Title: 51 strings, Tag: 21 strings, stock_num: 5 strings
-	header := append([]string{
-		"┌───────────────────────────────────────────────────┬─────────────────────┬─────┐",
-		"|                       TITLE                       |         TAG         |Stock|",
-	})
-	for _, val := range header {
-		fmt.Println(val)
-	}
+	// Print Top Header
+	fmt.Println(GenerateTopBar())
+
+	// Print Column Bar
+	fmt.Println(GenerateColumnBar())
 
 	// Print Articles
-	// var art_lines []string
 	for _, art := range arts {
-		spa_line := "├───────────────────────────────────────────────────┼─────────────────────┼─────┤"
-		fmt.Println(spa_line)
+		// Print Sperate Line
+		fmt.Println(GenerateSeperateBar())
 
-		// art_lines = GenerateArticleLines(art)
-		GenerateArticleLines(art)
-		// fmt.Println(art_lines)
+		// Print Article Lines
+		art_lines := GenerateArticleLines(art)
+		for _, article_line := range art_lines {
+			fmt.Println(article_line)
+		}
 	}
-
-	// Print Footer
-	footer := "└───────────────────────────────────────────────────┴─────────────────────┴─────┘"
-	fmt.Println(footer)
+	fmt.Println(GenerateSeperateBar())
+	// Now No Footer
 }
