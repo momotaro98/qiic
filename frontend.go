@@ -29,9 +29,9 @@ func MakeTurnedLines(str string, max_len int) (t_lines []string) {
 		} else if cur_half_len > max_len {
 			// Arrange to Full and Half
 			if isJustMaxLenFlag == true {
-				t_lines = append(t_lines, string(cur_line)+"|")
+				t_lines = append(t_lines, string(cur_line))
 			} else {
-				t_lines = append(t_lines, string(cur_line)+" |")
+				t_lines = append(t_lines, string(cur_line)+" ")
 			}
 			// Initalize stat variables
 			if eastasianwidth.IsFullwidth(r) {
@@ -48,11 +48,32 @@ func MakeTurnedLines(str string, max_len int) (t_lines []string) {
 	if rest_len := max_len - cur_half_len; rest_len > 0 {
 		spaces = strings.Repeat(" ", rest_len)
 	}
-	t_lines = append(t_lines, string(cur_line)+spaces+"|")
+	t_lines = append(t_lines, string(cur_line)+spaces)
 	return
 }
 
-func generateArticleLines(art Article) (art_lines []string) {
+// util
+func MakeFullLines(lines []string, max_hchar int, max_lines int) []string {
+	if diff_lines_len := max_lines - len(lines); diff_lines_len > 0 {
+		for i := 0; i < diff_lines_len; i++ {
+			lines = append(lines, strings.Repeat(" ", max_hchar))
+		}
+	}
+	return lines
+}
+
+// util
+func FindStringsMaxLen(lines_list [][]string) int {
+	max_len := 1
+	for _, lines := range lines_list {
+		if len(lines) > max_len {
+			max_len = len(lines)
+		}
+	}
+	return max_len
+}
+
+func GenerateArticleLines(art Article) (art_lines []string) {
 	// Title
 	title_lines := MakeTurnedLines(art.Title, max_title_half_len)
 
@@ -63,14 +84,33 @@ func generateArticleLines(art Article) (art_lines []string) {
 	}
 	tags_name := strings.Join(tags_name_list, ",")
 	tags_lines := MakeTurnedLines(tags_name, max_tag_half_len)
-	for _, line := range tags_lines {
-		fmt.Println(line)
-	}
 
-	// Like
-	// like_lines := art.StockCount
+	// Stock
+	stock_line := fmt.Sprintf("%5d", art.StockCount) // fixed to 5 char in stock
+	stock_lines := []string{stock_line}
 
-	// TODO: title_lines, tags_lines, and line_lines must be same length slice
+	// find max len
+	lines_list := [][]string{title_lines, tags_lines, stock_lines}
+	max_lines_len := FindStringsMaxLen(lines_list)
+
+	// make full lines
+	title_lines = MakeFullLines(title_lines, max_title_half_len, max_lines_len)
+	tags_lines = MakeFullLines(tags_lines, max_tag_half_len, max_lines_len)
+	stock_lines = MakeFullLines(stock_lines, max_stock_half_len, max_lines_len)
+
+	/*
+		// DeBug
+		for _, title := range title_lines {
+			fmt.Println(title)
+		}
+		for _, tag := range tags_lines {
+			fmt.Println(tag)
+		}
+		for _, stock := range stock_lines {
+			fmt.Println(stock)
+		}
+	*/
+
 	art_lines = title_lines
 	return art_lines
 }
@@ -92,8 +132,8 @@ func Render(arts []Article) {
 		spa_line := "├───────────────────────────────────────────────────┼─────────────────────┼─────┤"
 		fmt.Println(spa_line)
 
-		// art_lines = generateArticleLines(art)
-		generateArticleLines(art)
+		// art_lines = GenerateArticleLines(art)
+		GenerateArticleLines(art)
 		// fmt.Println(art_lines)
 	}
 
