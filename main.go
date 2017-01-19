@@ -64,6 +64,12 @@ func main() {
 		Render(as)
 		*/
 
+		// TEST MakeTurnedLines
+		generateTitleLines_strs_jp := MakeTurnedLines("python,golang", 61)
+		for _, line := range generateTitleLines_strs_jp {
+			fmt.Println(line)
+		}
+
 		/* Future Code
 		// generate backend struct including full api url
 		be := NewUserStockAPI(username)  // UserStockAPI implements Backend Interface
