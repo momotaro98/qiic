@@ -38,11 +38,14 @@ func main() {
 	app.Action = func(ctx *cli.Context) {
 		/*
 			TODO: make runnable structs
+				Main Func
 				[X]: backend struct (has full api url, Fetch)
 				[X]: Fetch Articles
 				[X]: Render with frontend struct
 					[X]: To Have Structs
 				[]: Access to the WebPage
+
+				Sub Func
 				[]: Filter Articles with tag, title etc
 		*/
 
@@ -51,10 +54,23 @@ func main() {
 		// tag := ctx.String("tag")
 		// title := ctx.String("title")
 
+		// Fetch from API Server
 		user_stock := NewUserStockAPI(username)
 		articles := user_stock.Fetch()
-		Render(articles)
+
+		// Save to Local File
+		Save(articles)
+
+		// Display
+		// Render(articles)
 		// *** Main End ***
+
+		/*// TEST Load func
+		loaded_articles, _ := Load()
+		for _, a := range loaded_articles {
+			fmt.Println(a.Title)
+		}
+		*/
 
 		/* // TEST NewTestArticles
 		as := NewTestArticles()
