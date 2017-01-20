@@ -42,8 +42,8 @@ func main() {
 				[X]: Fetch Articles
 				[X]: Render with frontend struct
 					[X]: To Have Structs
-				[]: Filter Articles with tag, title etc
 				[]: Access to the WebPage
+				[]: Filter Articles with tag, title etc
 		*/
 
 		// *** Main Start ***

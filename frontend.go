@@ -9,43 +9,43 @@ import (
 )
 
 const (
-	id_name            = "ID"
-	max_id_half_len    = 10
-	title_name         = "TITLE"
-	max_title_half_len = 51
-	tag_name           = "TAG"
-	max_tag_half_len   = 21
-	stock_name         = "STOCK"
-	max_stock_half_len = 5
+	access_num_name         = "A No"
+	max_access_num_half_len = 4
+	title_name              = "TITLE"
+	max_title_half_len      = 51
+	tag_name                = "TAG"
+	max_tag_half_len        = 21
+	stock_name              = "STOCK"
+	max_stock_half_len      = 5
 )
 
 type Column interface {
 	GetMaxHalfCharLen() int
 	MakeFilledInStr(split_char string) string
 	MakeCenterAlignedStr() string
-	GenerateTurnedLines(art Article) []string
+	GenerateTurnedLines(art_index int, art Article) []string
 }
 
-// IDColumn
-type IDColumn struct {
+// AccessNumColumn
+type AccessNumColumn struct {
 	Name           string
 	MaxHalfCharLen int
 }
 
-func (c IDColumn) GetMaxHalfCharLen() int {
+func (c AccessNumColumn) GetMaxHalfCharLen() int {
 	return c.MaxHalfCharLen
 }
 
-func (c IDColumn) MakeFilledInStr(split_char string) string {
+func (c AccessNumColumn) MakeFilledInStr(split_char string) string {
 	return strings.Repeat(split_char, c.MaxHalfCharLen)
 }
 
-func (c IDColumn) MakeCenterAlignedStr() string {
+func (c AccessNumColumn) MakeCenterAlignedStr() string {
 	return CenterAligned(c.Name, c.MaxHalfCharLen)
 }
 
-func (c IDColumn) GenerateTurnedLines(art Article) []string {
-	i_str := strconv.FormatInt(art.ID, 10)
+func (c AccessNumColumn) GenerateTurnedLines(art_index int, art Article) []string {
+	i_str := strconv.Itoa(art_index + 1) // On Display, Finally art_index Increments
 	rest_len := c.MaxHalfCharLen - len(i_str)
 	stock_line := i_str + strings.Repeat(" ", rest_len)
 	return []string{stock_line}
@@ -69,7 +69,7 @@ func (c TitleColumn) MakeCenterAlignedStr() string {
 	return CenterAligned(c.Name, c.MaxHalfCharLen)
 }
 
-func (c TitleColumn) GenerateTurnedLines(art Article) []string {
+func (c TitleColumn) GenerateTurnedLines(art_index int, art Article) []string {
 	return MakeTurnedLines(art.Title, c.MaxHalfCharLen)
 }
 
@@ -91,7 +91,7 @@ func (c TagColumn) MakeCenterAlignedStr() string {
 	return CenterAligned(c.Name, c.MaxHalfCharLen)
 }
 
-func (c TagColumn) GenerateTurnedLines(art Article) []string {
+func (c TagColumn) GenerateTurnedLines(art_index int, art Article) []string {
 	var tags_name_list []string
 	for _, tag := range art.Tags {
 		tags_name_list = append(tags_name_list, tag.Name)
@@ -118,7 +118,7 @@ func (c StockColumn) MakeCenterAlignedStr() string {
 	return CenterAligned(c.Name, c.MaxHalfCharLen)
 }
 
-func (c StockColumn) GenerateTurnedLines(art Article) []string {
+func (c StockColumn) GenerateTurnedLines(art_index int, art Article) []string {
 	i_str := strconv.Itoa(art.StockCount)
 	rest_len := c.MaxHalfCharLen - len(i_str)
 	stock_line := strings.Repeat(" ", rest_len) + i_str
@@ -222,10 +222,10 @@ func MakeFullLines(lines []string, max_hchar int, max_lines int) []string {
 }
 
 // func for Rendering
-func GenerateArticleLines(art Article, table Table) []string {
+func GenerateArticleLines(art_index int, art Article, table Table) []string {
 	columns_line_list := make([][]string, len(table.Columns))
 	for i, c := range table.Columns {
-		columns_line_list[i] = c.GenerateTurnedLines(art)
+		columns_line_list[i] = c.GenerateTurnedLines(art_index, art)
 	}
 
 	// find max len
@@ -256,13 +256,17 @@ func GenerateArticleLines(art Article, table Table) []string {
 func Render(arts []Article) {
 	// ### Change Point Start ###
 	// Initialize Columns
-	idColumn := IDColumn{Name: id_name, MaxHalfCharLen: max_id_half_len}
-	titleColumn := TitleColumn{Name: title_name, MaxHalfCharLen: max_title_half_len}
-	tagColumn := TagColumn{Name: tag_name, MaxHalfCharLen: max_tag_half_len}
-	stockColumn := StockColumn{Name: stock_name, MaxHalfCharLen: max_stock_half_len}
+	accessNumColumn := AccessNumColumn{Name: access_num_name,
+		MaxHalfCharLen: max_access_num_half_len}
+	titleColumn := TitleColumn{Name: title_name,
+		MaxHalfCharLen: max_title_half_len}
+	tagColumn := TagColumn{Name: tag_name,
+		MaxHalfCharLen: max_tag_half_len}
+	stockColumn := StockColumn{Name: stock_name,
+		MaxHalfCharLen: max_stock_half_len}
 
 	// make column list
-	columns := []Column{idColumn, titleColumn, tagColumn, stockColumn}
+	columns := []Column{accessNumColumn, titleColumn, tagColumn, stockColumn}
 	// ### Change Point End ###
 
 	// Register Columns to Table
@@ -274,12 +278,12 @@ func Render(arts []Article) {
 	fmt.Println(table.GenerateColumnnameLine())
 
 	// Print Articles
-	for _, art := range arts {
+	for art_index, art := range arts {
 		// Print Sperate Line
 		fmt.Println(table.GenerateSperateLine())
 
 		// Print Article Lines
-		art_lines := GenerateArticleLines(art, table)
+		art_lines := GenerateArticleLines(art_index, art, table)
 		for _, article_line := range art_lines {
 			fmt.Println(article_line)
 		}
