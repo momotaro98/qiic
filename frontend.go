@@ -17,14 +17,20 @@ const (
 )
 
 type Column interface {
+	GetMaxHalfCharLen() int
 	MakeFilledInStr(split_char string) string
 	MakeCenterAlignedStr() string
+	GenerateTurnedLines(art Article) []string
 }
 
 // TitleColumn
 type TitleColumn struct {
 	Name           string
 	MaxHalfCharLen int
+}
+
+func (c TitleColumn) GetMaxHalfCharLen() int {
+	return c.MaxHalfCharLen
 }
 
 func (c TitleColumn) MakeFilledInStr(split_char string) string {
@@ -35,10 +41,18 @@ func (c TitleColumn) MakeCenterAlignedStr() string {
 	return CenterAligned(c.Name, c.MaxHalfCharLen)
 }
 
+func (c TitleColumn) GenerateTurnedLines(art Article) []string {
+	return MakeTurnedLines(art.Title, c.MaxHalfCharLen)
+}
+
 // TagColumn
 type TagColumn struct {
 	Name           string
 	MaxHalfCharLen int
+}
+
+func (c TagColumn) GetMaxHalfCharLen() int {
+	return c.MaxHalfCharLen
 }
 
 func (c TagColumn) MakeFilledInStr(split_char string) string {
@@ -49,10 +63,23 @@ func (c TagColumn) MakeCenterAlignedStr() string {
 	return CenterAligned(c.Name, c.MaxHalfCharLen)
 }
 
+func (c TagColumn) GenerateTurnedLines(art Article) []string {
+	var tags_name_list []string
+	for _, tag := range art.Tags {
+		tags_name_list = append(tags_name_list, tag.Name)
+	}
+	tags_name := strings.Join(tags_name_list, ",")
+	return MakeTurnedLines(tags_name, c.MaxHalfCharLen)
+}
+
 // StockColumn
 type StockColumn struct {
 	Name           string
 	MaxHalfCharLen int
+}
+
+func (c StockColumn) GetMaxHalfCharLen() int {
+	return c.MaxHalfCharLen
 }
 
 func (c StockColumn) MakeFilledInStr(split_char string) string {
@@ -61,6 +88,11 @@ func (c StockColumn) MakeFilledInStr(split_char string) string {
 
 func (c StockColumn) MakeCenterAlignedStr() string {
 	return CenterAligned(c.Name, c.MaxHalfCharLen)
+}
+
+func (c StockColumn) GenerateTurnedLines(art Article) []string {
+	stock_line := fmt.Sprintf("%5d", art.StockCount) // fixed to 5 char in stock
+	return []string{stock_line}
 }
 
 // Table
@@ -90,6 +122,13 @@ func (t Table) GenerateSperateLine() string {
 		l_list[i] = c.MakeFilledInStr("─")
 	}
 	return "|" + strings.Join(l_list, "|") + "|"
+}
+
+// util func
+func CenterAligned(str string, max int) (ret string) {
+	rest_num := max - len(str)
+	ret = strings.Repeat(" ", rest_num/2) + str + strings.Repeat(" ", rest_num-rest_num/2)
+	return
 }
 
 // util func
@@ -131,17 +170,7 @@ func MakeTurnedLines(str string, max_len int) (t_lines []string) {
 	return
 }
 
-// util
-func MakeFullLines(lines []string, max_hchar int, max_lines int) []string {
-	if diff_lines_len := max_lines - len(lines); diff_lines_len > 0 {
-		for i := 0; i < diff_lines_len; i++ {
-			lines = append(lines, strings.Repeat(" ", max_hchar))
-		}
-	}
-	return lines
-}
-
-// util
+// util func
 func FindStringsMaxLen(lines_list [][]string) int {
 	max_len := 1
 	for _, lines := range lines_list {
@@ -152,64 +181,65 @@ func FindStringsMaxLen(lines_list [][]string) int {
 	return max_len
 }
 
-func GenerateArticleLines(art Article) []string {
-	// Title
-	title_lines := MakeTurnedLines(art.Title, max_title_half_len)
-
-	// Tags
-	var tags_name_list []string
-	for _, tag := range art.Tags {
-		tags_name_list = append(tags_name_list, tag.Name)
+// semi? util func
+func MakeFullLines(lines []string, max_hchar int, max_lines int) []string {
+	if diff_lines_len := max_lines - len(lines); diff_lines_len > 0 {
+		for i := 0; i < diff_lines_len; i++ {
+			lines = append(lines, strings.Repeat(" ", max_hchar))
+		}
 	}
-	tags_name := strings.Join(tags_name_list, ",")
-	tags_lines := MakeTurnedLines(tags_name, max_tag_half_len)
+	return lines
+}
 
-	// Stock
-	stock_line := fmt.Sprintf("%5d", art.StockCount) // fixed to 5 char in stock
-	stock_lines := []string{stock_line}
+// func for Rendering
+func GenerateArticleLines(art Article, table Table) []string {
+	columns_line_list := make([][]string, len(table.Columns))
+	for i, c := range table.Columns {
+		columns_line_list[i] = c.GenerateTurnedLines(art)
+	}
 
 	// find max len
-	lines_list := [][]string{title_lines, tags_lines, stock_lines}
-	max_lines_len := FindStringsMaxLen(lines_list)
+	maxInnerLinesLen := FindStringsMaxLen(columns_line_list)
 
 	// make full lines
-	title_lines = MakeFullLines(title_lines, max_title_half_len, max_lines_len)
-	tags_lines = MakeFullLines(tags_lines, max_tag_half_len, max_lines_len)
-	stock_lines = MakeFullLines(stock_lines, max_stock_half_len, max_lines_len)
+	for i, c := range table.Columns {
+		columns_line_list[i] = MakeFullLines(columns_line_list[i],
+			c.GetMaxHalfCharLen(), maxInnerLinesLen)
+	}
 
+	// join the columns factor to line
+	artInnerLineList := make([][]string, maxInnerLinesLen)
+	for _, cll := range columns_line_list {
+		for j, cl := range cll {
+			artInnerLineList[j] = append(artInnerLineList[j], cl)
+		}
+	}
 	// make ret lines
-	art_lines := make([]string, len(title_lines))
-	for i := 0; i < len(title_lines); i++ {
-		tit_line := title_lines[i]
-		tag_line := tags_lines[i]
-		sto_line := stock_lines[i]
-		a_lines_list := []string{tit_line, tag_line, sto_line}
-		art_lines[i] = "|" + strings.Join(a_lines_list, "|") + "|"
+	art_lines := make([]string, maxInnerLinesLen)
+	for i, ails := range artInnerLineList {
+		art_lines[i] = "|" + strings.Join(ails, "|") + "|"
 	}
 	return art_lines
 }
 
-// util
-func CenterAligned(str string, max int) (ret string) {
-	rest_num := max - len(str)
-	ret = strings.Repeat(" ", rest_num/2) + str + strings.Repeat(" ", rest_num-rest_num/2)
-	return
-}
-
+// interface func of frontend
 func Render(arts []Article) {
+	// ### Change Point Start ###
 	// Initialize Columns
 	titleColumn := TitleColumn{Name: title_name, MaxHalfCharLen: max_title_half_len}
 	tagColumn := TagColumn{Name: tag_name, MaxHalfCharLen: max_tag_half_len}
 	stockColumn := StockColumn{Name: stock_name, MaxHalfCharLen: max_stock_half_len}
+
 	// make column list
 	columns := []Column{titleColumn, tagColumn, stockColumn}
+	// ### Change Point End ###
 
 	// Register Columns to Table
 	table := Table{Columns: columns}
 
-	// Print Top Line
+	// Print Top Line (Firt Line)
 	fmt.Println(table.GenerateTopLine())
-	// Print Column Name Line
+	// Print Column Name Line (Second Line)
 	fmt.Println(table.GenerateColumnnameLine())
 
 	// Print Articles
@@ -218,11 +248,12 @@ func Render(arts []Article) {
 		fmt.Println(table.GenerateSperateLine())
 
 		// Print Article Lines
-		art_lines := GenerateArticleLines(art)
+		art_lines := GenerateArticleLines(art, table)
 		for _, article_line := range art_lines {
 			fmt.Println(article_line)
 		}
 	}
+
+	// Print Foote
 	fmt.Println(table.GenerateSperateLine())
-	// Now No Footer
 }

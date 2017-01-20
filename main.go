@@ -41,8 +41,9 @@ func main() {
 				[X]: backend struct (has full api url, Fetch)
 				[X]: Fetch Articles
 				[X]: Render with frontend struct
-					[]: To Have Structs
+					[X]: To Have Structs
 				[]: Filter Articles with tag, title etc
+				[]: Access to the WebPage
 		*/
 
 		// *** Main Start ***
@@ -64,14 +65,7 @@ func main() {
 		Render(as)
 		*/
 
-		/* // TEST MakeTurnedLines
-		generateTitleLines_strs_jp := MakeTurnedLines("python,golang", 61)
-		for _, line := range generateTitleLines_strs_jp {
-			fmt.Println(line)
-		}
-		*/
-
-		/* Future Code
+		/* Future Code???
 		// generate backend struct including full api url
 		be := NewUserStockAPI(username)  // UserStockAPI implements Backend Interface
 		// fetch the url's api data and
