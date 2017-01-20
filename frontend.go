@@ -2,12 +2,15 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/moznion/go-unicode-east-asian-width"
 )
 
 const (
+	id_name            = "ID"
+	max_id_half_len    = 10
 	title_name         = "TITLE"
 	max_title_half_len = 51
 	tag_name           = "TAG"
@@ -21,6 +24,31 @@ type Column interface {
 	MakeFilledInStr(split_char string) string
 	MakeCenterAlignedStr() string
 	GenerateTurnedLines(art Article) []string
+}
+
+// IDColumn
+type IDColumn struct {
+	Name           string
+	MaxHalfCharLen int
+}
+
+func (c IDColumn) GetMaxHalfCharLen() int {
+	return c.MaxHalfCharLen
+}
+
+func (c IDColumn) MakeFilledInStr(split_char string) string {
+	return strings.Repeat(split_char, c.MaxHalfCharLen)
+}
+
+func (c IDColumn) MakeCenterAlignedStr() string {
+	return CenterAligned(c.Name, c.MaxHalfCharLen)
+}
+
+func (c IDColumn) GenerateTurnedLines(art Article) []string {
+	i_str := strconv.FormatInt(art.ID, 10)
+	rest_len := c.MaxHalfCharLen - len(i_str)
+	stock_line := i_str + strings.Repeat(" ", rest_len)
+	return []string{stock_line}
 }
 
 // TitleColumn
@@ -91,7 +119,9 @@ func (c StockColumn) MakeCenterAlignedStr() string {
 }
 
 func (c StockColumn) GenerateTurnedLines(art Article) []string {
-	stock_line := fmt.Sprintf("%5d", art.StockCount) // fixed to 5 char in stock
+	i_str := strconv.Itoa(art.StockCount)
+	rest_len := c.MaxHalfCharLen - len(i_str)
+	stock_line := strings.Repeat(" ", rest_len) + i_str
 	return []string{stock_line}
 }
 
@@ -226,12 +256,13 @@ func GenerateArticleLines(art Article, table Table) []string {
 func Render(arts []Article) {
 	// ### Change Point Start ###
 	// Initialize Columns
+	idColumn := IDColumn{Name: id_name, MaxHalfCharLen: max_id_half_len}
 	titleColumn := TitleColumn{Name: title_name, MaxHalfCharLen: max_title_half_len}
 	tagColumn := TagColumn{Name: tag_name, MaxHalfCharLen: max_tag_half_len}
 	stockColumn := StockColumn{Name: stock_name, MaxHalfCharLen: max_stock_half_len}
 
 	// make column list
-	columns := []Column{titleColumn, tagColumn, stockColumn}
+	columns := []Column{idColumn, titleColumn, tagColumn, stockColumn}
 	// ### Change Point End ###
 
 	// Register Columns to Table
