@@ -7,6 +7,19 @@ import (
 	"github.com/urfave/cli"
 )
 
+/*
+	TODO: make runnable structs
+		Main Func
+		[X]: backend struct (has full api url, Fetch)
+		[X]: Fetch Articles
+		[X]: Render with frontend struct
+			[X]: To Have Structs
+		[]: Access to the WebPage
+
+		Sub Func
+		[]: Filter Articles with tag, title etc
+*/
+
 const version string = "0.0.1"
 
 func main() {
@@ -15,94 +28,63 @@ func main() {
 	app.Usage = "Display Qiita' Stock and Access the Web Page"
 	app.UsageText = "quita command [arguments...]"
 	app.Version = version
-
-	app.Flags = []cli.Flag{
-		cli.StringFlag{
-			Name:   "username, u",
-			Value:  "",
-			Usage:  "qiita username",
-			EnvVar: "QIITA_USERNAME",
-		},
-		cli.StringFlag{
-			Name:  "tag, t",
-			Value: "",
-			Usage: "query stock with tag name",
-		},
-		cli.StringFlag{
-			Name:  "title, ttl",
-			Value: "",
-			Usage: "query stock with title name",
-		},
-	}
-
-	app.Action = func(ctx *cli.Context) {
+	app.Commands = []cli.Command{
 		/*
-			TODO: make runnable structs
-				Main Func
-				[X]: backend struct (has full api url, Fetch)
-				[X]: Fetch Articles
-				[X]: Render with frontend struct
-					[X]: To Have Structs
-				[]: Access to the WebPage
-
-				Sub Func
-				[]: Filter Articles with tag, title etc
+			{
+				Name:    "access",
+				Aliases: []string{"a"},
+				Usage:   "access to the Access Number WebPage",
+				Action: func(c *cli.Context) error {
+					fmt.Println("added task: ", c.Args().First())
+					return nil
+				},
+			},
 		*/
-
-		// *** Main Start ***
-		username := ctx.String("username")
-		// tag := ctx.String("tag")
-		// title := ctx.String("title")
-
-		// Fetch from API Server
-		user_stock := NewUserStockAPI(username)
-		articles := user_stock.Fetch()
-
-		// Save to Local File
-		Save(articles)
-
-		// Display
-		// Render(articles)
-		// *** Main End ***
-
-		/*// TEST Load func
-		loaded_articles, _ := Load()
-		for _, a := range loaded_articles {
-			fmt.Println(a.Title)
-		}
-		*/
-
-		/* // TEST NewTestArticles
-		as := NewTestArticles()
-		for _, a := range as {
-			// fmt.Println(a.ID, a.User, a.Title, a.Tags)
-			fmt.Println(a.ID, a.Tweet)
-		}
-		Render(as)
-		*/
-
-		/* Future Code???
-		// generate backend struct including full api url
-		be := NewUserStockAPI(username)  // UserStockAPI implements Backend Interface
-		// fetch the url's api data and
-		// store the data as original struct type(articles, tags, users...etc)
-		arts := be.Fetch()
-
-		// filter the articles according to specified tag and title name
-		arts, err := arts.Filter(tag, title)  // TODO: the arguments should be capsuled
-		if err != nil {
-			log.Fatalf("Error!")
-		}
-
-		// select frontend type
-		fe, ok := NewCLIFontEnd(ctx)  // CLIFrontEnd implements FrontEnd Interface
-		if !ok {
-			log.Fatalf("Not OK")
-		}
-		render according to the articles data and frontend type
-		fe.Render(arts)
-		*/
+		{
+			Name:    "list",
+			Aliases: []string{"l", "ls"},
+			Usage:   "list the local saved articles",
+			Action: func(c *cli.Context) error {
+				articles, err := Load()
+				if err != nil {
+					return err
+				}
+				Render(articles)
+				return nil
+			},
+		},
+		{
+			Name:    "update",
+			Aliases: []string{"u"},
+			Usage:   "update the stocked articles and Access Number",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:   "username, user",
+					Value:  "",
+					Usage:  "qiita username",
+					EnvVar: "QIITA_USERNAME",
+				},
+			},
+			Action: func(ctx *cli.Context) error {
+				username := ctx.String("username")
+				// Fetch from API Server
+				user_stock := NewUserStockAPI(username)
+				articles := user_stock.Fetch()
+				// Save to Local File
+				err := Save(articles)
+				if err != nil {
+					return err
+				}
+				// Display
+				Render(articles)
+				return nil
+			},
+		},
 	}
-
+	/*
+		// Test Using app.Action
+		app.Action = func(ctx *cli.Context) {
+		}
+	*/
 	app.Run(os.Args)
 }
