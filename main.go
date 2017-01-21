@@ -1,8 +1,9 @@
 package main
 
 import (
-	// "fmt"
+	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/urfave/cli"
 )
@@ -11,81 +12,78 @@ const version string = "0.0.1"
 
 func main() {
 	app := cli.NewApp()
-	app.Name = "quita"
-	app.Usage = "Display Qiita' Stock and Access the Web Page"
-	app.UsageText = "quita command [arguments...]"
+	app.Name = "qiic"
+	app.Usage = "Display Qiita Stocked Articles and Access the Web Page"
+	app.UsageText = "qiic command [arguments...]"
 	app.Version = version
-
-	app.Flags = []cli.Flag{
-		cli.StringFlag{
-			Name:   "username, u",
-			Value:  "",
-			Usage:  "qiita username",
-			EnvVar: "QIITA_USERNAME",
+	app.Commands = []cli.Command{
+		{
+			Name:    "access",
+			Aliases: []string{"a", "open"},
+			Usage:   "access to the Access Number WebPage",
+			Action: func(ctx *cli.Context) error {
+				if len(ctx.Args()) != 1 {
+					return fmt.Errorf("Error! Need one Access Number argument\nUsage Example: qiic a 3")
+				}
+				arg_Anum, err := strconv.Atoi(ctx.Args().First())
+				if err != nil {
+					return fmt.Errorf("Error! Argument is required to be number\nUsage Example: qiic a 3")
+				}
+				articles, err := Load()
+				if err != nil {
+					return err
+				}
+				if !(0 < arg_Anum && arg_Anum <= len(articles)) {
+					return fmt.Errorf("Error! Argument number is out of range of the articles Access Number\nUsage Example: qiic a 3")
+				}
+				target_article := articles[arg_Anum-1] // need decrement
+				err = OpenBrowser(target_article.URL)
+				if err != nil {
+					return err
+				}
+				return nil
+			},
 		},
-		cli.StringFlag{
-			Name:  "tag, t",
-			Value: "",
-			Usage: "query stock with tag name",
+		{
+			Name:    "list",
+			Aliases: []string{"l", "ls"},
+			Usage:   "list the local saved articles",
+			Action: func(ctx *cli.Context) error {
+				articles, err := Load()
+				if err != nil {
+					return err
+				}
+				Render(articles)
+				return nil
+			},
 		},
-		cli.StringFlag{
-			Name:  "title, ttl",
-			Value: "",
-			Usage: "query stock with title name",
+		{
+			Name:    "update",
+			Aliases: []string{"u"},
+			Usage:   "update the stocked articles and Access Number",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:   "username, user",
+					Value:  "",
+					Usage:  "qiita username",
+					EnvVar: "QIITA_USERNAME",
+				},
+			},
+			Action: func(ctx *cli.Context) error {
+				username := ctx.String("username")
+				// Fetch from API Server
+				user_stock := NewUserStockAPI(username)
+				articles := user_stock.Fetch()
+				// Save to Local File
+				err := Save(articles)
+				if err != nil {
+					return err
+				}
+				// Display
+				Render(articles)
+				return nil
+			},
 		},
-	}
-
-	app.Action = func(ctx *cli.Context) {
-		/*
-			TODO: make runnable structs
-				[X]: backend struct (has full api url, Fetch)
-				[X]: Fetch Articles
-				[X]: Render with frontend struct
-					[X]: To Have Structs
-				[]: Filter Articles with tag, title etc
-				[]: Access to the WebPage
-		*/
-
-		// *** Main Start ***
-		username := ctx.String("username")
-		// tag := ctx.String("tag")
-		// title := ctx.String("title")
-
-		user_stock := NewUserStockAPI(username)
-		articles := user_stock.Fetch()
-		Render(articles)
-		// *** Main End ***
-
-		/* // TEST NewTestArticles
-		as := NewTestArticles()
-		for _, a := range as {
-			// fmt.Println(a.ID, a.User, a.Title, a.Tags)
-			fmt.Println(a.ID, a.Tweet)
-		}
-		Render(as)
-		*/
-
-		/* Future Code???
-		// generate backend struct including full api url
-		be := NewUserStockAPI(username)  // UserStockAPI implements Backend Interface
-		// fetch the url's api data and
-		// store the data as original struct type(articles, tags, users...etc)
-		arts := be.Fetch()
-
-		// filter the articles according to specified tag and title name
-		arts, err := arts.Filter(tag, title)  // TODO: the arguments should be capsuled
-		if err != nil {
-			log.Fatalf("Error!")
-		}
-
-		// select frontend type
-		fe, ok := NewCLIFontEnd(ctx)  // CLIFrontEnd implements FrontEnd Interface
-		if !ok {
-			log.Fatalf("Not OK")
-		}
-		render according to the articles data and frontend type
-		fe.Render(arts)
-		*/
 	}
 
 	app.Run(os.Args)
