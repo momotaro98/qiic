@@ -1,50 +1,54 @@
 package main
 
 import (
-	// "fmt"
+	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/urfave/cli"
 )
-
-/*
-	TODO: make runnable structs
-		Main Func
-		[X]: backend struct (has full api url, Fetch)
-		[X]: Fetch Articles
-		[X]: Render with frontend struct
-			[X]: To Have Structs
-		[]: Access to the WebPage
-
-		Sub Func
-		[]: Filter Articles with tag, title etc
-*/
 
 const version string = "0.0.1"
 
 func main() {
 	app := cli.NewApp()
-	app.Name = "quita"
-	app.Usage = "Display Qiita' Stock and Access the Web Page"
-	app.UsageText = "quita command [arguments...]"
+	app.Name = "qiic"
+	app.Usage = "Display Qiita Stocked Articles and Access the Web Page"
+	app.UsageText = "qiic command [arguments...]"
 	app.Version = version
 	app.Commands = []cli.Command{
-		/*
-			{
-				Name:    "access",
-				Aliases: []string{"a"},
-				Usage:   "access to the Access Number WebPage",
-				Action: func(c *cli.Context) error {
-					fmt.Println("added task: ", c.Args().First())
-					return nil
-				},
+		{
+			Name:    "access",
+			Aliases: []string{"a", "open"},
+			Usage:   "access to the Access Number WebPage",
+			Action: func(ctx *cli.Context) error {
+				if len(ctx.Args()) != 1 {
+					return fmt.Errorf("Error! Need one Access Number argument\nUsage Example: qiic a 3")
+				}
+				arg_Anum, err := strconv.Atoi(ctx.Args().First())
+				if err != nil {
+					return fmt.Errorf("Error! Argument is required to be number\nUsage Example: qiic a 3")
+				}
+				articles, err := Load()
+				if err != nil {
+					return err
+				}
+				if !(0 < arg_Anum && arg_Anum <= len(articles)) {
+					return fmt.Errorf("Error! Argument number is out of range of the articles Access Number\nUsage Example: qiic a 3")
+				}
+				target_article := articles[arg_Anum-1] // need decrement
+				err = OpenBrowser(target_article.URL)
+				if err != nil {
+					return err
+				}
+				return nil
 			},
-		*/
+		},
 		{
 			Name:    "list",
 			Aliases: []string{"l", "ls"},
 			Usage:   "list the local saved articles",
-			Action: func(c *cli.Context) error {
+			Action: func(ctx *cli.Context) error {
 				articles, err := Load()
 				if err != nil {
 					return err
@@ -81,10 +85,6 @@ func main() {
 			},
 		},
 	}
-	/*
-		// Test Using app.Action
-		app.Action = func(ctx *cli.Context) {
-		}
-	*/
+
 	app.Run(os.Args)
 }
