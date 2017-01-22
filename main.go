@@ -8,12 +8,12 @@ import (
 	"github.com/urfave/cli"
 )
 
-const version string = "0.0.1"
+const version string = "1.0.1"
 
 func main() {
 	app := cli.NewApp()
 	app.Name = "qiic"
-	app.Usage = "Display Qiita Stocked Articles and Access the Web Page"
+	app.Usage = "Get Qiita Stocked Articles and Access the Web Page"
 	app.UsageText = "qiic command [arguments...]"
 	app.Version = version
 	app.Commands = []cli.Command{
