@@ -2,7 +2,7 @@
 qiic is command line tool for Qiita service data using their v1 API.
 
 ##Features
-* get your **20** *Stocked* Qiita articles
+* get your **20 Stocked** Qiita articles
 * show the articles with readable table
 * open the articles in your browser with an allocated number
 
@@ -10,6 +10,7 @@ qiic is command line tool for Qiita service data using their v1 API.
 
 ### Option 1: Go Get
 If you have installed go platform, executing `go get` command is easy to install.
+
 To install or update the qiic binary into your $GOPATH as usual, run:
 ```bash
 $ go get -u github.com/momotaro98/qiic
@@ -35,7 +36,7 @@ $ qiic u
 ```
 u | update          update stocked articles to local
 l | ls | list       list all local articles
-a | acess | open    generate gitignore files
+a | access | open    generate gitignore files
 ```
 
 ### Basic Usage
@@ -53,17 +54,17 @@ Exmaple:
 ┌────┬───────────────────────────────────────────────────┬─────────────────────┬─────┐
 |A No|                       TITLE                       |         TAG         |STOCK|
 |────|───────────────────────────────────────────────────|─────────────────────|─────|
-|1   |Go のクロスコンパイル環境構築                          |Go                   |  354|
+|1   |Go のクロスコンパイル環境構築                            |Go                   |  354|
 |────|───────────────────────────────────────────────────|─────────────────────|─────|
-|2   |GitHubのリリース機能を使う                            |GitHub               |  272|
+|2   |GitHubのリリース機能を使う                              |GitHub               |  272|
 |────|───────────────────────────────────────────────────|─────────────────────|─────|
-|3   |Golang Goの並列処理を学ぶ(goroutine, channel)        |Go,golang            |   28|
+|3   |Golang Goの並列処理を学ぶ(goroutine, channel)         |Go,golang            |   28|
 |────|───────────────────────────────────────────────────|─────────────────────|─────|
 .
 .
 .
 |────|───────────────────────────────────────────────────|─────────────────────|─────|
-|20  |Go言語: var, init, mainが実行される順番               |Go                   |   10|
+|20  |Go言語: var, init, mainが実行される順番                |Go                   |   10|
 |────|───────────────────────────────────────────────────|─────────────────────|─────|
 ```
 
