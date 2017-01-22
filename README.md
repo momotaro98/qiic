@@ -16,10 +16,10 @@ To install or update the qiic binary into your $GOPATH as usual, run:
 $ go get -u github.com/momotaro98/qiic
 ```
 
-<!--
 ### Option 2: Binary
-Download the latest binary from the [Releases page](https://github.com/karan/joe/releases). It's the easiest way to get started with `joe`.
--->
+If you're **Mac** user, download the latest binary from the [Releases page](https://github.com/momotaro98/qiic/releases).
+
+It's the easiest way to get started with `qiic`.
 
 ##Setup
 0. **Set Environment Variable `QIITA_USERNAME`, your Qiita user name.**
