@@ -1,6 +1,8 @@
 #qiic
 qiic is command line tool for Qiita service data using their v1 API.
 
+![qiic_demo](https://github.com/momotaro98/my-project-images/blob/master/qiic/demo.gif)
+
 ##Features
 * get your **20 Stocked** Qiita articles
 * show the articles with readable table
