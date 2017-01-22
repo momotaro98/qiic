@@ -4,21 +4,21 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 )
 
 // Qiita v1 API "GET /api/v1/users/:url_name/stocks"
 type UserStockAPI struct {
 	UserName string
+	Page     int
 }
 
 const (
-	qiitaUserStockURI = "https://qiita.com/api/v1/users/%s/stocks"
+	qiitaUserStockURI = "https://qiita.com/api/v1/users/%s/stocks?page=%d"
 )
 
-func NewUserStockAPI(UserName string) *UserStockAPI {
-	us := UserStockAPI{UserName: UserName}
+func NewUserStockAPI(UserName string, Page int) *UserStockAPI {
+	us := UserStockAPI{UserName: UserName, Page: Page}
 	return &us
 }
 
@@ -45,10 +45,10 @@ func (us *UserStockAPI) fetch(url string) ([]Article, error) {
 }
 
 // Fetch (HTTP Access)
-func (us *UserStockAPI) Fetch() []Article {
-	articles, err := us.fetch(fmt.Sprintf(qiitaUserStockURI, us.UserName))
+func (us *UserStockAPI) Fetch() ([]Article, error) {
+	articles, err := us.fetch(fmt.Sprintf(qiitaUserStockURI, us.UserName, us.Page))
 	if err != nil {
-		log.Fatalf("Failed to fetch the user stock data: %v\n", err)
+		return nil, err
 	}
-	return articles
+	return articles, nil
 }

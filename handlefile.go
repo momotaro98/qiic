@@ -68,7 +68,7 @@ func Save(arts []Article) error {
 func Load() ([]Article, error) {
 	body, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		return nil, fmt.Errorf("Unable to load %s", filePath)
+		return nil, fmt.Errorf("Unable to load %s\nGet your articles with executing the following command\n$ qiic u", filePath)
 	}
 	var articles []Article
 	if err := json.Unmarshal(body, &articles); err != nil {

@@ -34,7 +34,7 @@ func main() {
 					return err
 				}
 				if !(0 < arg_Anum && arg_Anum <= len(articles)) {
-					return fmt.Errorf("Error! Argument number is out of range of the articles Access Number\nUsage Example: qiic a 3")
+					return fmt.Errorf("Error! The argument number is out of range of the articles Access Number\nUsage Example: qiic a 3\nCheck Articles Number with\nqiic u\n  or\nqiic l")
 				}
 				target_article := articles[arg_Anum-1] // need decrement
 				err = OpenBrowser(target_article.URL)
@@ -64,18 +64,26 @@ func main() {
 			Flags: []cli.Flag{
 				cli.StringFlag{
 					Name:   "username, user",
-					Value:  "",
 					Usage:  "qiita username",
 					EnvVar: "QIITA_USERNAME",
+				},
+				cli.IntFlag{
+					Name:  "page, p",
+					Value: 1,
+					Usage: "page number",
 				},
 			},
 			Action: func(ctx *cli.Context) error {
 				username := ctx.String("username")
+				page := ctx.Int("page")
 				// Fetch from API Server
-				user_stock := NewUserStockAPI(username)
-				articles := user_stock.Fetch()
+				user_stock := NewUserStockAPI(username, page)
+				articles, err := user_stock.Fetch()
+				if err != nil {
+					return err
+				}
 				// Save to Local File
-				err := Save(articles)
+				err = Save(articles)
 				if err != nil {
 					return err
 				}
