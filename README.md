@@ -50,7 +50,7 @@ $ qiic u  # get your 20 updated Qiita stocked articles and show them
 You'll see the 20 articles' list
 Exmaple:
 
-```bash
+```
 ┌────┬───────────────────────────────────────────────────┬─────────────────────┬─────┐
 |A No|                       TITLE                       |         TAG         |STOCK|
 |────|───────────────────────────────────────────────────|─────────────────────|─────|
@@ -71,7 +71,7 @@ Exmaple:
 You can open the article in your browser with Access Number(A No)
 with `qiic a [A No]`
 
-```
+```bash
 $ qiic a 2  # Open the specified article (A No is 2) in your browser
 ```
 
@@ -79,7 +79,7 @@ $ qiic a 2  # Open the specified article (A No is 2) in your browser
 
 You can get your 20 Qiita stocked article with page specified.
 
-```
+```bash
 $ qiic u -p 2
 ```
 
