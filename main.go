@@ -78,9 +78,12 @@ func main() {
 				page := ctx.Int("page")
 				// Fetch from API Server
 				user_stock := NewUserStockAPI(username, page)
-				articles := user_stock.Fetch()
+				articles, err := user_stock.Fetch()
+				if err != nil {
+					return err
+				}
 				// Save to Local File
-				err := Save(articles)
+				err = Save(articles)
 				if err != nil {
 					return err
 				}

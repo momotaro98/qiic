@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 )
 
@@ -46,10 +45,10 @@ func (us *UserStockAPI) fetch(url string) ([]Article, error) {
 }
 
 // Fetch (HTTP Access)
-func (us *UserStockAPI) Fetch() []Article {
+func (us *UserStockAPI) Fetch() ([]Article, error) {
 	articles, err := us.fetch(fmt.Sprintf(qiitaUserStockURI, us.UserName, us.Page))
 	if err != nil {
-		log.Fatalf("Failed to fetch the user stock data: %v\n", err)
+		return nil, err
 	}
-	return articles
+	return articles, nil
 }
