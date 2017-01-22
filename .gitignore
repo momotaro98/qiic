@@ -1,5 +1,8 @@
 #### joe made this: http://goel.io/joe
 
+# Mac
+.DS_Store
+
 # Common
 *.swp
 
