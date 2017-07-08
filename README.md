@@ -1,29 +1,34 @@
-#qiic
+# qiic
+
 qiic is command line tool for Qiita service data using their v1 API.
 
 ![qiic_demo](https://github.com/momotaro98/my-project-images/blob/master/qiic/demo.gif)
 
-##Features
+## Features
+
 * get your **20 Stocked** Qiita articles
 * show the articles with readable table
 * open the articles in your browser with an allocated number
 
-##Installation
+## Installation
 
 ### Option 1: Go Get
 If you have installed go platform, executing `go get` command is easy to install.
 
 To install or update the qiic binary into your $GOPATH as usual, run:
+
 ```bash
 $ go get -u github.com/momotaro98/qiic
 ```
 
 ### Option 2: Binary
+
 If you're **Mac** user, download the latest binary from the [Releases page](https://github.com/momotaro98/qiic/releases).
 
 It's the easiest way to get started with `qiic`.
 
-##Setup
+## Setup
+
 0. **Set Environment Variable `QIITA_USERNAME`, your Qiita user name.**
 0. Execute first update command.
 
@@ -31,7 +36,7 @@ It's the easiest way to get started with `qiic`.
 $ qiic u
 ```
 
-##Usage
+## Usage
 
 ### Commands:
 
