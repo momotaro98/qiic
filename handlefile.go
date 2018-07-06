@@ -12,7 +12,7 @@ const fileName = ".qiic-json"
 
 var filePath = path.Join(os.Getenv("HOME"), fileName)
 
-// Remove Body and StockUsers From Article Struct
+// SavedArticle is strcut for saving file into local machine.
 type SavedArticle struct {
 	ID               int64  `json:"id"`
 	UUID             string `json:"uuid"`
@@ -32,6 +32,7 @@ type SavedArticle struct {
 	Stocked          bool   `json:"stocked"`
 }
 
+// Save saves the json file into local.
 func Save(arts []Article) error {
 	savedArticles := make([]SavedArticle, len(arts))
 	for i, art := range arts {
@@ -65,6 +66,7 @@ func Save(arts []Article) error {
 	return nil
 }
 
+// Load loads the json file from local.
 func Load() ([]Article, error) {
 	body, err := ioutil.ReadFile(filePath)
 	if err != nil {

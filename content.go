@@ -1,5 +1,6 @@
 package main
 
+// Article is a struct of Qiita data model.
 type Article struct {
 	ID               int64  `json:"id"`
 	UUID             string `json:"uuid"`
@@ -21,6 +22,7 @@ type Article struct {
 	Stocked      bool   `json:"stocked"`
 }
 
+// NewTestArticle is a constructor of Article.
 func NewTestArticle(ID int64, User *User, Title string, Tags []Tag) Article {
 	UUID := "abcdefghijklmnopqrstuvwxyz"
 	a := Article{ID: ID, UUID: UUID,
@@ -28,6 +30,7 @@ func NewTestArticle(ID int64, User *User, Title string, Tags []Tag) Article {
 	return a
 }
 
+// NewTestArticles is a constructor for tests.
 func NewTestArticles() []Article {
 	as := make([]Article, 5)
 	as[0] = NewTestArticle(1, NewTestUser(), "title01", NewTestTags("python", "golang"))
@@ -38,13 +41,15 @@ func NewTestArticles() []Article {
 	return as
 }
 
+// User is a struct of a user on Qiita.
 type User struct {
-	ID              int    `json: "id"`
-	Following       bool   `json: "following"`
+	ID              int    `json:"id"`
+	Following       bool   `json:"following"`
 	URLName         string `json:"url_name"`
 	ProfileImageURL string `json:"profile_image_url"`
 }
 
+// NewTestUser a constructor for tests.
 func NewTestUser() *User {
 	ID := 100
 	Following := false
@@ -54,6 +59,7 @@ func NewTestUser() *User {
 	return &u
 }
 
+// Tag is a struct of Qiita data model.
 type Tag struct {
 	Name     string   `json:"name"`
 	URLName  string   `json:"url_name"`
@@ -61,6 +67,7 @@ type Tag struct {
 	Versions []string `json:"versions"`
 }
 
+// NewTestTag is a constructor for tests.
 func NewTestTag(Name string) Tag {
 	URLName := "https://qiita.com/" + Name
 	IconURL := "https://qiita.com/icon/" + Name
@@ -70,6 +77,7 @@ func NewTestTag(Name string) Tag {
 	return t
 }
 
+// NewTestTags is a constructor for tests.
 func NewTestTags(tag1 string, tag2 string) []Tag {
 	ts := make([]Tag, 2)
 	ts[0] = NewTestTag(tag1)

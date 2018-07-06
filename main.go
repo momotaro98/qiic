@@ -25,7 +25,7 @@ func main() {
 				if len(ctx.Args()) != 1 {
 					return fmt.Errorf("Error! Need one Access Number argument\nUsage Example: qiic a 3")
 				}
-				arg_Anum, err := strconv.Atoi(ctx.Args().First())
+				argAnum, err := strconv.Atoi(ctx.Args().First())
 				if err != nil {
 					return fmt.Errorf("Error! Argument is required to be number\nUsage Example: qiic a 3")
 				}
@@ -33,11 +33,11 @@ func main() {
 				if err != nil {
 					return err
 				}
-				if !(0 < arg_Anum && arg_Anum <= len(articles)) {
+				if !(0 < argAnum && argAnum <= len(articles)) {
 					return fmt.Errorf("Error! The argument number is out of range of the articles Access Number\nUsage Example: qiic a 3\nCheck Articles Number with\nqiic u\n  or\nqiic l")
 				}
-				target_article := articles[arg_Anum-1] // need decrement
-				err = OpenBrowser(target_article.URL)
+				targetArticle := articles[argAnum-1] // need decrement
+				err = OpenBrowser(targetArticle.URL)
 				if err != nil {
 					return err
 				}
@@ -77,8 +77,8 @@ func main() {
 				username := ctx.String("username")
 				page := ctx.Int("page")
 				// Fetch from API Server
-				user_stock := NewUserStockAPI(username, page)
-				articles, err := user_stock.Fetch()
+				userStock := NewUserStockAPI(username, page)
+				articles, err := userStock.Fetch()
 				if err != nil {
 					return err
 				}

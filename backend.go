@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-// Qiita v1 API "GET /api/v1/users/:url_name/stocks"
+// UserStockAPI is Qiita v1 API "GET /api/v1/users/:url_name/stocks"
 type UserStockAPI struct {
 	UserName string
 	Page     int
@@ -17,6 +17,7 @@ const (
 	qiitaUserStockURI = "https://qiita.com/api/v1/users/%s/stocks?page=%d"
 )
 
+// NewUserStockAPI is a func.
 func NewUserStockAPI(UserName string, Page int) *UserStockAPI {
 	us := UserStockAPI{UserName: UserName, Page: Page}
 	return &us
@@ -38,7 +39,7 @@ func (us *UserStockAPI) fetch(url string) ([]Article, error) {
 
 	var articles []Article
 	if err := json.Unmarshal(body, &articles); err != nil {
-		return nil, fmt.Errorf("Unable to unmarshal response (%s): %v\n", url, err)
+		return nil, fmt.Errorf("Unable to unmarshal response (%s): %v", url, err)
 
 	}
 	return articles, nil

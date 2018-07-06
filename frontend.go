@@ -9,261 +9,281 @@ import (
 )
 
 const (
-	access_num_name         = "A No"
-	max_access_num_half_len = 4
-	title_name              = "TITLE"
-	max_title_half_len      = 51
-	tag_name                = "TAG"
-	max_tag_half_len        = 21
-	stock_name              = "STOCK"
-	max_stock_half_len      = 5
+	accessNumName       = "A No"
+	maxAccessNumHalfLen = 4
+	titleName           = "TITLE"
+	maxTitleHalfLen     = 51
+	tagName             = "TAG"
+	maxTagHalfLen       = 21
+	stockName           = "STOCK"
+	maxStockHalfLen     = 5
 )
 
+// Column is struct of Column
 type Column interface {
 	GetMaxHalfCharLen() int
-	MakeFilledInStr(split_char string) string
+	MakeFilledInStr(splitChar string) string
 	MakeCenterAlignedStr() string
-	GenerateTurnedLines(art_index int, art Article) []string
+	GenerateTurnedLines(artIndex int, art Article) []string
 }
 
-// AccessNumColumn
+// AccessNumColumn is struct
 type AccessNumColumn struct {
 	Name           string
 	MaxHalfCharLen int
 }
 
+// GetMaxHalfCharLen is func.
 func (c AccessNumColumn) GetMaxHalfCharLen() int {
 	return c.MaxHalfCharLen
 }
 
-func (c AccessNumColumn) MakeFilledInStr(split_char string) string {
-	return strings.Repeat(split_char, c.MaxHalfCharLen)
+// MakeFilledInStr is func.
+func (c AccessNumColumn) MakeFilledInStr(splitChar string) string {
+	return strings.Repeat(splitChar, c.MaxHalfCharLen)
 }
 
+// MakeCenterAlignedStr is func.
 func (c AccessNumColumn) MakeCenterAlignedStr() string {
 	return CenterAligned(c.Name, c.MaxHalfCharLen)
 }
 
-func (c AccessNumColumn) GenerateTurnedLines(art_index int, art Article) []string {
-	i_str := strconv.Itoa(art_index + 1) // On Display, Finally art_index Increments
-	rest_len := c.MaxHalfCharLen - len(i_str)
-	stock_line := i_str + strings.Repeat(" ", rest_len)
-	return []string{stock_line}
+// GenerateTurnedLines is func.
+func (c AccessNumColumn) GenerateTurnedLines(artIndex int, art Article) []string {
+	iStr := strconv.Itoa(artIndex + 1) // On Display, Finally artIndex Increments
+	restLen := c.MaxHalfCharLen - len(iStr)
+	stockLine := iStr + strings.Repeat(" ", restLen)
+	return []string{stockLine}
 }
 
-// TitleColumn
+// TitleColumn is struct.
 type TitleColumn struct {
 	Name           string
 	MaxHalfCharLen int
 }
 
+// GetMaxHalfCharLen is a func.
 func (c TitleColumn) GetMaxHalfCharLen() int {
 	return c.MaxHalfCharLen
 }
 
-func (c TitleColumn) MakeFilledInStr(split_char string) string {
-	return strings.Repeat(split_char, c.MaxHalfCharLen)
+// MakeFilledInStr is a func.
+func (c TitleColumn) MakeFilledInStr(splitChar string) string {
+	return strings.Repeat(splitChar, c.MaxHalfCharLen)
 }
 
+// MakeCenterAlignedStr is a func.
 func (c TitleColumn) MakeCenterAlignedStr() string {
 	return CenterAligned(c.Name, c.MaxHalfCharLen)
 }
 
-func (c TitleColumn) GenerateTurnedLines(art_index int, art Article) []string {
+// GenerateTurnedLines is a func.
+func (c TitleColumn) GenerateTurnedLines(artIndex int, art Article) []string {
 	return MakeTurnedLines(art.Title, c.MaxHalfCharLen)
 }
 
-// TagColumn
+// TagColumn is struct.
 type TagColumn struct {
 	Name           string
 	MaxHalfCharLen int
 }
 
+// GetMaxHalfCharLen is a func.
 func (c TagColumn) GetMaxHalfCharLen() int {
 	return c.MaxHalfCharLen
 }
 
-func (c TagColumn) MakeFilledInStr(split_char string) string {
-	return strings.Repeat(split_char, c.MaxHalfCharLen)
+// MakeFilledInStr is a func.
+func (c TagColumn) MakeFilledInStr(splitChar string) string {
+	return strings.Repeat(splitChar, c.MaxHalfCharLen)
 }
 
+// MakeCenterAlignedStr is a func.
 func (c TagColumn) MakeCenterAlignedStr() string {
 	return CenterAligned(c.Name, c.MaxHalfCharLen)
 }
 
-func (c TagColumn) GenerateTurnedLines(art_index int, art Article) []string {
-	var tags_name_list []string
+// GenerateTurnedLines in a func.
+func (c TagColumn) GenerateTurnedLines(artIndex int, art Article) []string {
+	var tagsNameList []string
 	for _, tag := range art.Tags {
-		tags_name_list = append(tags_name_list, tag.Name)
+		tagsNameList = append(tagsNameList, tag.Name)
 	}
-	tags_name := strings.Join(tags_name_list, ",")
-	return MakeTurnedLines(tags_name, c.MaxHalfCharLen)
+	tagsName := strings.Join(tagsNameList, ",")
+	return MakeTurnedLines(tagsName, c.MaxHalfCharLen)
 }
 
-// StockColumn
+// StockColumn is a struct.
 type StockColumn struct {
 	Name           string
 	MaxHalfCharLen int
 }
 
+// GetMaxHalfCharLen is func.
 func (c StockColumn) GetMaxHalfCharLen() int {
 	return c.MaxHalfCharLen
 }
 
-func (c StockColumn) MakeFilledInStr(split_char string) string {
-	return strings.Repeat(split_char, c.MaxHalfCharLen)
+// MakeFilledInStr is a func.
+func (c StockColumn) MakeFilledInStr(splitChar string) string {
+	return strings.Repeat(splitChar, c.MaxHalfCharLen)
 }
 
+// MakeCenterAlignedStr is a func.
 func (c StockColumn) MakeCenterAlignedStr() string {
 	return CenterAligned(c.Name, c.MaxHalfCharLen)
 }
 
-func (c StockColumn) GenerateTurnedLines(art_index int, art Article) []string {
-	i_str := strconv.Itoa(art.StockCount)
-	rest_len := c.MaxHalfCharLen - len(i_str)
-	stock_line := strings.Repeat(" ", rest_len) + i_str
-	return []string{stock_line}
+// GenerateTurnedLines is a func.
+func (c StockColumn) GenerateTurnedLines(artIndex int, art Article) []string {
+	iStr := strconv.Itoa(art.StockCount)
+	restLen := c.MaxHalfCharLen - len(iStr)
+	stockLine := strings.Repeat(" ", restLen) + iStr
+	return []string{stockLine}
 }
 
-// Table
+// Table is struct of table
 type Table struct {
 	Columns []Column
 }
 
+// GenerateTopLine is func
 func (t Table) GenerateTopLine() string {
-	l_list := make([]string, len(t.Columns))
+	lList := make([]string, len(t.Columns))
 	for i, c := range t.Columns {
-		l_list[i] = c.MakeFilledInStr("─")
+		lList[i] = c.MakeFilledInStr("─")
 	}
-	return "┌" + strings.Join(l_list, "┬") + "┐"
+	return "┌" + strings.Join(lList, "┬") + "┐"
 }
 
+// GenerateColumnnameLine is func
 func (t Table) GenerateColumnnameLine() string {
-	l_list := make([]string, len(t.Columns))
+	lList := make([]string, len(t.Columns))
 	for i, c := range t.Columns {
-		l_list[i] = c.MakeCenterAlignedStr()
+		lList[i] = c.MakeCenterAlignedStr()
 	}
-	return "|" + strings.Join(l_list, "|") + "|"
+	return "|" + strings.Join(lList, "|") + "|"
 }
 
+// GenerateSperateLine is func
 func (t Table) GenerateSperateLine() string {
-	l_list := make([]string, len(t.Columns))
+	lList := make([]string, len(t.Columns))
 	for i, c := range t.Columns {
-		l_list[i] = c.MakeFilledInStr("─")
+		lList[i] = c.MakeFilledInStr("─")
 	}
-	return "|" + strings.Join(l_list, "|") + "|"
+	return "|" + strings.Join(lList, "|") + "|"
 }
 
-// util func
+// CenterAligned is a util func
 func CenterAligned(str string, max int) (ret string) {
-	rest_num := max - len(str)
-	ret = strings.Repeat(" ", rest_num/2) + str + strings.Repeat(" ", rest_num-rest_num/2)
+	restNum := max - len(str)
+	ret = strings.Repeat(" ", restNum/2) + str + strings.Repeat(" ", restNum-restNum/2)
 	return
 }
 
-// util func
-func MakeTurnedLines(str string, max_len int) (t_lines []string) {
+// MakeTurnedLines is a util func
+func MakeTurnedLines(str string, maxLen int) (tLines []string) {
 	var isJustMaxLenFlag bool
-	var cur_half_len int
-	var cur_line []rune
+	var curHalfLen int
+	var curLine []rune
 	for _, r := range str { // 'r' means rune
 		if eastasianwidth.IsFullwidth(r) {
-			cur_half_len += 2
+			curHalfLen += 2
 		} else {
-			cur_half_len++
+			curHalfLen++
 		}
-		if cur_half_len == max_len {
+		if curHalfLen == maxLen {
 			isJustMaxLenFlag = true
-		} else if cur_half_len > max_len {
+		} else if curHalfLen > maxLen {
 			// Arrange to Full and Half
 			if isJustMaxLenFlag == true {
-				t_lines = append(t_lines, string(cur_line))
+				tLines = append(tLines, string(curLine))
 			} else {
-				t_lines = append(t_lines, string(cur_line)+" ")
+				tLines = append(tLines, string(curLine)+" ")
 			}
 			// Initalize stat variables
 			if eastasianwidth.IsFullwidth(r) {
-				cur_half_len = 2
+				curHalfLen = 2
 			} else {
-				cur_half_len = 1
+				curHalfLen = 1
 			}
 			isJustMaxLenFlag = false
-			cur_line = nil
+			curLine = nil
 		}
-		cur_line = append(cur_line, r)
+		curLine = append(curLine, r)
 	}
 	var spaces string
-	if rest_len := max_len - cur_half_len; rest_len > 0 {
-		spaces = strings.Repeat(" ", rest_len)
+	if restLen := maxLen - curHalfLen; restLen > 0 {
+		spaces = strings.Repeat(" ", restLen)
 	}
-	t_lines = append(t_lines, string(cur_line)+spaces)
+	tLines = append(tLines, string(curLine)+spaces)
 	return
 }
 
-// util func
-func FindStringsMaxLen(lines_list [][]string) int {
-	max_len := 1
-	for _, lines := range lines_list {
-		if len(lines) > max_len {
-			max_len = len(lines)
+// FindStringsMaxLen is a util func
+func FindStringsMaxLen(linesList [][]string) int {
+	maxLen := 1
+	for _, lines := range linesList {
+		if len(lines) > maxLen {
+			maxLen = len(lines)
 		}
 	}
-	return max_len
+	return maxLen
 }
 
-// semi? util func
-func MakeFullLines(lines []string, max_hchar int, max_lines int) []string {
-	if diff_lines_len := max_lines - len(lines); diff_lines_len > 0 {
-		for i := 0; i < diff_lines_len; i++ {
-			lines = append(lines, strings.Repeat(" ", max_hchar))
+// MakeFullLines is a semi? util func
+func MakeFullLines(lines []string, maxHchar int, maxLines int) []string {
+	if diffLinesLen := maxLines - len(lines); diffLinesLen > 0 {
+		for i := 0; i < diffLinesLen; i++ {
+			lines = append(lines, strings.Repeat(" ", maxHchar))
 		}
 	}
 	return lines
 }
 
-// func for Rendering
-func GenerateArticleLines(art_index int, art Article, table Table) []string {
-	columns_line_list := make([][]string, len(table.Columns))
+// GenerateArticleLines is func for Rendering
+func GenerateArticleLines(artIndex int, art Article, table Table) []string {
+	columnsLineList := make([][]string, len(table.Columns))
 	for i, c := range table.Columns {
-		columns_line_list[i] = c.GenerateTurnedLines(art_index, art)
+		columnsLineList[i] = c.GenerateTurnedLines(artIndex, art)
 	}
 
 	// find max len
-	maxInnerLinesLen := FindStringsMaxLen(columns_line_list)
+	maxInnerLinesLen := FindStringsMaxLen(columnsLineList)
 
 	// make full lines
 	for i, c := range table.Columns {
-		columns_line_list[i] = MakeFullLines(columns_line_list[i],
+		columnsLineList[i] = MakeFullLines(columnsLineList[i],
 			c.GetMaxHalfCharLen(), maxInnerLinesLen)
 	}
 
 	// join the columns factor to line
 	artInnerLineList := make([][]string, maxInnerLinesLen)
-	for _, cll := range columns_line_list {
+	for _, cll := range columnsLineList {
 		for j, cl := range cll {
 			artInnerLineList[j] = append(artInnerLineList[j], cl)
 		}
 	}
 	// make ret lines
-	art_lines := make([]string, maxInnerLinesLen)
+	artLines := make([]string, maxInnerLinesLen)
 	for i, ails := range artInnerLineList {
-		art_lines[i] = "|" + strings.Join(ails, "|") + "|"
+		artLines[i] = "|" + strings.Join(ails, "|") + "|"
 	}
-	return art_lines
+	return artLines
 }
 
-// interface func of frontend
+// Render is interface func of frontend
 func Render(arts []Article) {
 	// ### Change Point Start ###
 	// Initialize Columns
-	accessNumColumn := AccessNumColumn{Name: access_num_name,
-		MaxHalfCharLen: max_access_num_half_len}
-	titleColumn := TitleColumn{Name: title_name,
-		MaxHalfCharLen: max_title_half_len}
-	tagColumn := TagColumn{Name: tag_name,
-		MaxHalfCharLen: max_tag_half_len}
-	stockColumn := StockColumn{Name: stock_name,
-		MaxHalfCharLen: max_stock_half_len}
+	accessNumColumn := AccessNumColumn{Name: accessNumName,
+		MaxHalfCharLen: maxAccessNumHalfLen}
+	titleColumn := TitleColumn{Name: titleName,
+		MaxHalfCharLen: maxTitleHalfLen}
+	tagColumn := TagColumn{Name: tagName,
+		MaxHalfCharLen: maxTagHalfLen}
+	stockColumn := StockColumn{Name: stockName,
+		MaxHalfCharLen: maxStockHalfLen}
 
 	// make column list
 	columns := []Column{accessNumColumn, titleColumn, tagColumn, stockColumn}
@@ -278,14 +298,14 @@ func Render(arts []Article) {
 	fmt.Println(table.GenerateColumnnameLine())
 
 	// Print Articles
-	for art_index, art := range arts {
+	for artIndex, art := range arts {
 		// Print Sperate Line
 		fmt.Println(table.GenerateSperateLine())
 
 		// Print Article Lines
-		art_lines := GenerateArticleLines(art_index, art, table)
-		for _, article_line := range art_lines {
-			fmt.Println(article_line)
+		artLines := GenerateArticleLines(artIndex, art, table)
+		for _, articleLine := range artLines {
+			fmt.Println(articleLine)
 		}
 	}
 

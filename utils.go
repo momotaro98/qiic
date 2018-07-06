@@ -6,6 +6,7 @@ import (
 	"runtime"
 )
 
+// OpenBrowser opens browser with taken URL.
 func OpenBrowser(url string) error {
 	switch runtime.GOOS {
 	case "linux":
@@ -15,7 +16,7 @@ func OpenBrowser(url string) error {
 	case "darwin":
 		exec.Command("open", url).Start()
 	default:
-		return fmt.Errorf("%s is not supported.", runtime.GOOS)
+		return fmt.Errorf("%s is not supported", runtime.GOOS)
 	}
 
 	return nil
