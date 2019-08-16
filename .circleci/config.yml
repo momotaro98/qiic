@@ -1,0 +1,19 @@
+version: 2
+jobs:
+    build:
+        docker:
+            - image: golang:1.12.5-stretch
+        working_directory: /go/src/github.com/momotaro98/qiic
+
+        steps:
+            - checkout
+            - run:
+                name: Set environment variable
+                command: |
+                    echo 'export GO111MODULE="on"' >> $BASH_ENV
+            - run:
+                name: Go get
+                command: go get ./...
+            - run:
+                name: Run unit tests
+                command: make test

@@ -1,0 +1,12 @@
+# Common
+.git
+.gitignore
+Makefile
+Dockerfile
+.dockerignore
+README.md
+.envrc
+
+# Go
+build
+vendor

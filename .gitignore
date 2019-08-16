@@ -37,5 +37,5 @@ _testmain.go
 
 # External packages folder
 vendor/
-
 build/
+release/
