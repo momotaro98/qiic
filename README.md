@@ -93,3 +93,18 @@ $ qiic u -p 2
 Your 21-40th logged stocked articles will be got.
 
 If p is 3, 41-60th alike.
+
+## Development
+
+```
+$ make
+$ ./build/qiic_darwin_amd64/qiic
+```
+
+## Release
+
+Generate a zip file for MacOS for now
+
+```
+$ make release-files
+```
