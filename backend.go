@@ -14,7 +14,7 @@ type UserStockAPI struct {
 }
 
 const (
-	qiitaUserStockURI = "https://qiita.com/api/v1/users/%s/stocks?page=%d"
+	qiitaUserStockURI = "https://qiita.com/api/v2/users/%s/stocks?page=%d&per_page=20"
 )
 
 // NewUserStockAPI is a func.
@@ -37,12 +37,24 @@ func (us *UserStockAPI) fetch(url string) ([]Article, error) {
 		return nil, fmt.Errorf("Unable to read response body (%s): %v", url, err)
 	}
 
-	var articles []Article
-	if err := json.Unmarshal(body, &articles); err != nil {
+	var articlesFromApi []QiitaArticle
+	if err := json.Unmarshal(body, &articlesFromApi); err != nil {
 		return nil, fmt.Errorf("Unable to unmarshal response (%s): %v", url, err)
 
 	}
-	return articles, nil
+	// Convert API data model to qiic domain model
+	var ret []Article
+	for _, a := range articlesFromApi {
+		var tags []Tag
+		for _, t := range a.Tags {
+			tag := NewTag(t.Name)
+			tags = append(tags, tag)
+		}
+		article := NewArticle(a.ID, a.Title, tags, a.LikesCount, a.URL)
+		ret = append(ret, article)
+	}
+
+	return ret, nil
 }
 
 // Fetch (HTTP Access)

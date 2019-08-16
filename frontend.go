@@ -15,8 +15,8 @@ const (
 	maxTitleHalfLen     = 51
 	tagName             = "TAG"
 	maxTagHalfLen       = 21
-	stockName           = "STOCK"
-	maxStockHalfLen     = 5
+	likeName            = "LIKE"
+	maxLikeHalfLen      = 5
 )
 
 // Column is struct of Column
@@ -52,8 +52,8 @@ func (c AccessNumColumn) MakeCenterAlignedStr() string {
 func (c AccessNumColumn) GenerateTurnedLines(artIndex int, art Article) []string {
 	iStr := strconv.Itoa(artIndex + 1) // On Display, Finally artIndex Increments
 	restLen := c.MaxHalfCharLen - len(iStr)
-	stockLine := iStr + strings.Repeat(" ", restLen)
-	return []string{stockLine}
+	likeLine := iStr + strings.Repeat(" ", restLen)
+	return []string{likeLine}
 }
 
 // TitleColumn is struct.
@@ -113,33 +113,33 @@ func (c TagColumn) GenerateTurnedLines(artIndex int, art Article) []string {
 	return MakeTurnedLines(tagsName, c.MaxHalfCharLen)
 }
 
-// StockColumn is a struct.
-type StockColumn struct {
+// LikesColumn is a struct.
+type LikesColumn struct {
 	Name           string
 	MaxHalfCharLen int
 }
 
 // GetMaxHalfCharLen is func.
-func (c StockColumn) GetMaxHalfCharLen() int {
+func (c LikesColumn) GetMaxHalfCharLen() int {
 	return c.MaxHalfCharLen
 }
 
 // MakeFilledInStr is a func.
-func (c StockColumn) MakeFilledInStr(splitChar string) string {
+func (c LikesColumn) MakeFilledInStr(splitChar string) string {
 	return strings.Repeat(splitChar, c.MaxHalfCharLen)
 }
 
 // MakeCenterAlignedStr is a func.
-func (c StockColumn) MakeCenterAlignedStr() string {
+func (c LikesColumn) MakeCenterAlignedStr() string {
 	return CenterAligned(c.Name, c.MaxHalfCharLen)
 }
 
 // GenerateTurnedLines is a func.
-func (c StockColumn) GenerateTurnedLines(artIndex int, art Article) []string {
-	iStr := strconv.Itoa(art.StockCount)
+func (c LikesColumn) GenerateTurnedLines(artIndex int, art Article) []string {
+	iStr := strconv.Itoa(art.LikesCount)
 	restLen := c.MaxHalfCharLen - len(iStr)
-	stockLine := strings.Repeat(" ", restLen) + iStr
-	return []string{stockLine}
+	likeLine := strings.Repeat(" ", restLen) + iStr
+	return []string{likeLine}
 }
 
 // Table is struct of table
@@ -282,11 +282,11 @@ func Render(arts []Article) {
 		MaxHalfCharLen: maxTitleHalfLen}
 	tagColumn := TagColumn{Name: tagName,
 		MaxHalfCharLen: maxTagHalfLen}
-	stockColumn := StockColumn{Name: stockName,
-		MaxHalfCharLen: maxStockHalfLen}
+	likeColumn := LikesColumn{Name: likeName,
+		MaxHalfCharLen: maxLikeHalfLen}
 
 	// make column list
-	columns := []Column{accessNumColumn, titleColumn, tagColumn, stockColumn}
+	columns := []Column{accessNumColumn, titleColumn, tagColumn, likeColumn}
 	// ### Change Point End ###
 
 	// Register Columns to Table
