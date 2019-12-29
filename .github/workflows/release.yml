@@ -2,9 +2,6 @@ on:
   push:
     branches:
       - master
-  pull_request:
-    branches:
-      - master
 
 name: Release
 
@@ -27,7 +24,7 @@ jobs:
   release:
     strategy:
       matrix:
-        go-version: 1.13.1
+        go-version: [1.13.1]
         platform: [macos-latest, windows-latest]
 
     runs-on: ${{ matrix.platform }}
