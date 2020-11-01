@@ -1,4 +1,4 @@
-FROM golang:1.12.5-stretch as builder
+FROM golang:1.15.3-buster as builder
 
 WORKDIR /workdir
 
