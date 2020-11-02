@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/moznion/go-unicode-east-asian-width"
+	eastasianwidth "github.com/moznion/go-unicode-east-asian-width"
 )
 
 const (
@@ -24,7 +24,7 @@ type Column interface {
 	GetMaxHalfCharLen() int
 	MakeFilledInStr(splitChar string) string
 	MakeCenterAlignedStr() string
-	GenerateTurnedLines(artIndex int, art Article) []string
+	GenerateTurnedLines(artIndex int, art *Article) []string
 }
 
 // AccessNumColumn is struct
@@ -49,7 +49,7 @@ func (c AccessNumColumn) MakeCenterAlignedStr() string {
 }
 
 // GenerateTurnedLines is func.
-func (c AccessNumColumn) GenerateTurnedLines(artIndex int, art Article) []string {
+func (c AccessNumColumn) GenerateTurnedLines(artIndex int, art *Article) []string {
 	iStr := strconv.Itoa(artIndex + 1) // On Display, Finally artIndex Increments
 	restLen := c.MaxHalfCharLen - len(iStr)
 	likeLine := iStr + strings.Repeat(" ", restLen)
@@ -78,7 +78,7 @@ func (c TitleColumn) MakeCenterAlignedStr() string {
 }
 
 // GenerateTurnedLines is a func.
-func (c TitleColumn) GenerateTurnedLines(artIndex int, art Article) []string {
+func (c TitleColumn) GenerateTurnedLines(artIndex int, art *Article) []string {
 	return MakeTurnedLines(art.Title, c.MaxHalfCharLen)
 }
 
@@ -104,7 +104,7 @@ func (c TagColumn) MakeCenterAlignedStr() string {
 }
 
 // GenerateTurnedLines in a func.
-func (c TagColumn) GenerateTurnedLines(artIndex int, art Article) []string {
+func (c TagColumn) GenerateTurnedLines(artIndex int, art *Article) []string {
 	var tagsNameList []string
 	for _, tag := range art.Tags {
 		tagsNameList = append(tagsNameList, tag.Name)
@@ -135,7 +135,7 @@ func (c LikesColumn) MakeCenterAlignedStr() string {
 }
 
 // GenerateTurnedLines is a func.
-func (c LikesColumn) GenerateTurnedLines(artIndex int, art Article) []string {
+func (c LikesColumn) GenerateTurnedLines(artIndex int, art *Article) []string {
 	iStr := strconv.Itoa(art.LikesCount)
 	restLen := c.MaxHalfCharLen - len(iStr)
 	likeLine := strings.Repeat(" ", restLen) + iStr
@@ -242,7 +242,7 @@ func MakeFullLines(lines []string, maxHchar int, maxLines int) []string {
 }
 
 // GenerateArticleLines is func for Rendering
-func GenerateArticleLines(artIndex int, art Article, table Table) []string {
+func GenerateArticleLines(artIndex int, art *Article, table Table) []string {
 	columnsLineList := make([][]string, len(table.Columns))
 	for i, c := range table.Columns {
 		columnsLineList[i] = c.GenerateTurnedLines(artIndex, art)
@@ -273,7 +273,7 @@ func GenerateArticleLines(artIndex int, art Article, table Table) []string {
 }
 
 // Render is interface func of frontend
-func Render(arts []Article) {
+func Render(arts []*Article) {
 	// ### Change Point Start ###
 	// Initialize Columns
 	accessNumColumn := AccessNumColumn{Name: accessNumName,

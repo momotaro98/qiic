@@ -22,7 +22,7 @@ type SavedArticle struct {
 }
 
 // Save saves the json file into local.
-func Save(arts []Article) error {
+func Save(arts []*Article) error {
 	savedArticles := make([]SavedArticle, len(arts))
 	for i, art := range arts {
 		savedArticles[i] = SavedArticle{
@@ -45,12 +45,12 @@ func Save(arts []Article) error {
 }
 
 // Load loads the json file from local.
-func Load() ([]Article, error) {
+func Load() ([]*Article, error) {
 	body, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to load %s\nGet your articles with executing the following command\n$ qiic u", filePath)
 	}
-	var articles []Article
+	var articles []*Article
 	if err := json.Unmarshal(body, &articles); err != nil {
 		return nil, fmt.Errorf("Unable to unmashal body")
 	}

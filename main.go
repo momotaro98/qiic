@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"sort"
 	"strconv"
 
 	"github.com/urfave/cli"
@@ -82,6 +83,49 @@ func main() {
 				if err != nil {
 					return err
 				}
+				// Save to Local File
+				err = Save(articles)
+				if err != nil {
+					return err
+				}
+				// Display
+				Render(articles)
+				return nil
+			},
+		},
+		{
+			Name:    "rank",
+			Aliases: []string{"r"},
+			Usage:   "LGTM ranking",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:   "token, t",
+					Usage:  "qiita api token",
+					EnvVar: "QIITA_TOKEN",
+				},
+				cli.IntFlag{
+					Name:  "page, p",
+					Value: 1,
+					Usage: "page number",
+				},
+			},
+			Action: func(ctx *cli.Context) error {
+				token := ctx.String("token")
+				page := ctx.Int("page")
+				// Fetch from API Server
+				articles, err := GetAuthenticatedUserItems(
+					&ReqGetAuthenticatedUserItems{
+						Token: token,
+						Page:  page,
+					})
+				if err != nil {
+					return err
+				}
+
+				sort.SliceStable(articles, func(i, j int) bool {
+					return articles[i].LikesCount > articles[j].LikesCount
+				})
+
 				// Save to Local File
 				err = Save(articles)
 				if err != nil {
