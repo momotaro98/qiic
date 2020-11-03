@@ -8,4 +8,5 @@ require (
 	github.com/stretchr/testify v1.4.0
 	github.com/tomnomnom/linkheader v0.0.0-20180905144013-02ca5825eb80
 	github.com/urfave/cli v1.21.0
+	golang.org/x/sync v0.0.0-20180314180146-1d60e4601c6f
 )

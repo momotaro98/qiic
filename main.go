@@ -1,15 +1,17 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"sort"
 	"strconv"
+	"sync"
 
 	"github.com/urfave/cli"
 )
 
-const Version = "1.1.0"
+const Version = "1.2.0"
 
 func main() {
 	app := cli.NewApp()
@@ -21,7 +23,7 @@ func main() {
 		{
 			Name:    "access",
 			Aliases: []string{"a", "open"},
-			Usage:   "access to the Access Number WebPage",
+			Usage:   "access to the Access Number Article Page",
 			Action: func(ctx *cli.Context) error {
 				if len(ctx.Args()) != 1 {
 					return fmt.Errorf("Error! Need one Access Number argument\nUsage Example: qiic a 3")
@@ -48,7 +50,7 @@ func main() {
 		{
 			Name:    "list",
 			Aliases: []string{"l", "ls"},
-			Usage:   "list the local saved articles",
+			Usage:   "list local saved articles",
 			Action: func(ctx *cli.Context) error {
 				articles, err := Load()
 				if err != nil {
@@ -59,14 +61,15 @@ func main() {
 			},
 		},
 		{
-			Name:    "update",
-			Aliases: []string{"u"},
+			Name:    "stock",
+			Aliases: []string{"s"},
 			Usage:   "update the stocked articles and Access Number",
 			Flags: []cli.Flag{
 				cli.StringFlag{
-					Name:   "username, user",
+					Name:   "username, user, u",
 					Usage:  "qiita username",
 					EnvVar: "QIITA_USERNAME",
+					Value:  "",
 				},
 				cli.IntFlag{
 					Name:  "page, p",
@@ -77,6 +80,13 @@ func main() {
 			Action: func(ctx *cli.Context) error {
 				username := ctx.String("username")
 				page := ctx.Int("page")
+
+				if username == "" {
+					msg := "username is required"
+					fmt.Println(msg)
+					return fmt.Errorf(msg)
+				}
+
 				// Fetch from API Server
 				req := &UserStockRequest{
 					UserName: username,
@@ -84,18 +94,13 @@ func main() {
 						Page: page,
 					},
 				}
-				articles, _, err := GetArticles(req)
+				articles, _, err := GetArticles(context.Background(), req)
 				if err != nil {
+					fmt.Println(err)
 					return err
 				}
-				// Save to Local File
-				err = Save(articles)
-				if err != nil {
-					return err
-				}
-				// Display
-				Render(articles)
-				return nil
+
+				return SaveAndRender(articles)
 			},
 		},
 		{
@@ -104,9 +109,16 @@ func main() {
 			Usage:   "LGTM ranking",
 			Flags: []cli.Flag{
 				cli.StringFlag{
+					Name:   "username, user, u",
+					Usage:  "qiita username",
+					EnvVar: "QIITA_USERNAME",
+					Value:  "",
+				},
+				cli.StringFlag{
 					Name:   "token, t",
 					Usage:  "qiita api token",
 					EnvVar: "QIITA_TOKEN",
+					Value:  "",
 				},
 				cli.IntFlag{
 					Name:  "page, p",
@@ -115,17 +127,39 @@ func main() {
 				},
 			},
 			Action: func(ctx *cli.Context) error {
+				username := ctx.String("username")
 				token := ctx.String("token")
 				page := ctx.Int("page")
-				// Fetch from API Server
-				req := &ReqGetAuthenticatedUserItems{
-					GetRequest{
-						Token: token,
-						Page:  page,
-					},
+
+				var (
+					c   = context.Background()
+					req ArticlesGetRequester
+				)
+
+				if token != "" {
+					c = SetToken(c, token)
+					req = &ReqGetAuthenticatedUserItems{
+						GetRequest{
+							Page: 1,
+						},
+					}
+				} else if username != "" {
+					c = SetUserName(context.Background(), username)
+					req = &ReqGetUserItems{
+						GetRequest{
+							Page: 1,
+						},
+					}
+				} else {
+					msg := "either token or username is required"
+					fmt.Println(msg)
+					return fmt.Errorf(msg)
 				}
-				articles, _, err := GetArticles(req)
+
+				// Fetch from API Server
+				articles, err := CollectUserItems(c, req)
 				if err != nil {
+					fmt.Println(err)
 					return err
 				}
 
@@ -133,17 +167,46 @@ func main() {
 					return articles[i].LikesCount > articles[j].LikesCount
 				})
 
-				// Save to Local File
-				err = Save(articles)
-				if err != nil {
-					return err
+				// Paging
+				const ArtPerPage = 15
+				start := ArtPerPage * (page - 1)
+				end := start + ArtPerPage
+				num := len(articles)
+				if num <= start {
+					articles = []*Article{}
+				} else if num < end {
+					articles = articles[start:num]
+				} else {
+					articles = articles[start:end]
 				}
-				// Display
-				Render(articles)
-				return nil
+
+				return SaveAndRender(articles)
 			},
 		},
 	}
 
 	app.Run(os.Args)
+}
+
+func SaveAndRender(articles []*Article) error {
+	var wg sync.WaitGroup
+
+	// Save file
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if err := Save(articles); err != nil {
+			fmt.Println("saving a file for cache failed")
+		}
+	}()
+
+	// Display
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		Render(articles)
+	}()
+
+	wg.Wait()
+	return nil
 }
