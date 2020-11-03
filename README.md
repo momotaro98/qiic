@@ -13,13 +13,20 @@ qiic is unofficial command line tool to see Qiita articles data using its API.
 
 ## Installation
 
-### Option 1: Go Get
+### Option 1: Only for MacOS user, Homebrew
+
+```
+$ brew tap momotaro98/qiic
+$ brew install momotaro98/qiic/qiic
+```
+
+### Option 2: Go Get
 If you have installed go platform, executing `go get` command is easy to install.
 
 To install or update the qiic binary into your $GOPATH as usual, run:
 
 ```bash
-$ go get -u github.com/momotaro98/qiic
+$ go get -u github.com/momotaro98/qiic/cmd/qiic
 ```
 
 ### Option 2: Binary

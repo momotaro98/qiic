@@ -13,7 +13,7 @@ import (
 	"github.com/momotaro98/qiic"
 )
 
-const Version = "1.2.0"
+const Version = "1.2.2"
 
 func main() {
 	app := cli.NewApp()
