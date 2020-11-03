@@ -2,6 +2,7 @@
 
 qiic
 .envrc
+dist/
 
 # Mac
 .DS_Store
