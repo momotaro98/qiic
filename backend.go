@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/tomnomnom/linkheader"
 )
 
 const (
@@ -17,40 +19,58 @@ func setAuthHeader(req *http.Request, token string) {
 	req.Header.Set("Authorization", val)
 }
 
-type ReqGetAuthenticatedUserItems struct {
+type GetRequest struct {
 	Token string
 	Page  int
 }
 
-func GetAuthenticatedUserItems(reqObj *ReqGetAuthenticatedUserItems) ([]*Article, error) {
-	url := fmt.Sprintf(qiitaGetAuthenticatedUserItemsURI, reqObj.Page)
+type ArticlesGetRequester interface {
+	AssembleURL() (url string)
+	SetAuthHeader(req *http.Request)
+}
+
+type Links struct {
+	linkheader.Links
+}
+
+func GetArticles(r ArticlesGetRequester) (articles []*Article, links *Links, err error) {
+	url := r.AssembleURL()
 	req, _ := http.NewRequest(http.MethodGet, url, nil)
-	setAuthHeader(req, reqObj.Token)
+	//setAuthHeader(req, reqObj.Token)
+	r.SetAuthHeader(req)
 	client := new(http.Client)
 	res, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	defer res.Body.Close()
 
 	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, nil, fmt.Errorf("unable to read response body (%s): %v", url, err)
+	}
 
 	if res.StatusCode != 200 {
 		body, _ := ioutil.ReadAll(res.Body)
-		return nil, fmt.Errorf("response is not 200. res: %+v, body: %+v\n", res, body)
+		return nil, nil, fmt.Errorf("response is not 200. res: %+v, body: %+v\n", res, body)
 	}
 
-	if err != nil {
-		return nil, fmt.Errorf("Unable to read response body (%s): %v", url, err)
+	if h := res.Header["Link"]; len(h) == 1 {
+		header := h[0]
+		links = &Links{
+			linkheader.Parse(header),
+		}
+		for _, link := range links.Links {
+			fmt.Printf("URL: %s; Rel: %s\n", link.URL, link.Rel)
+		}
 	}
 
 	var articlesFromApi []QiitaArticle
 	if err := json.Unmarshal(body, &articlesFromApi); err != nil {
-		return nil, fmt.Errorf("Unable to unmarshal response (%s): %v", url, err)
+		return nil, nil, fmt.Errorf("unable to unmarshal response (%s): %v", url, err)
 
 	}
 	// Convert API data model to qiic domain model
-	var ret []*Article
 	for _, a := range articlesFromApi {
 		var tags []Tag
 		for _, t := range a.Tags {
@@ -58,63 +78,37 @@ func GetAuthenticatedUserItems(reqObj *ReqGetAuthenticatedUserItems) ([]*Article
 			tags = append(tags, tag)
 		}
 		article := NewArticle(a.ID, a.Title, tags, a.LikesCount, a.URL)
-		ret = append(ret, &article)
+		articles = append(articles, &article)
 	}
 
-	return ret, nil
+	return articles, links, nil
 }
 
-// UserStockAPI is Qiita v2 API resource "GET /api/v2/users/:url_name/stocks"
-type UserStockAPI struct {
+type ReqGetAuthenticatedUserItems struct {
+	GetRequest
+}
+
+func (r *ReqGetAuthenticatedUserItems) AssembleURL() string {
+	return fmt.Sprintf(qiitaGetAuthenticatedUserItemsURI, r.Page)
+}
+
+func (r *ReqGetAuthenticatedUserItems) SetAuthHeader(req *http.Request) {
+	setAuthHeader(req, r.Token)
+}
+
+// func CollectAuthenticatedUserItems(reqObj *ReqGetAuthenticatedUserItems) ([]*Article, error) {
+// }
+
+// UserStockRequest is Qiita v2 API resource "GET /api/v2/users/:url_name/stocks"
+type UserStockRequest struct {
 	UserName string
-	Page     int
+	GetRequest
 }
 
-// NewUserStockAPI is a func.
-func NewUserStockAPI(UserName string, Page int) *UserStockAPI {
-	us := UserStockAPI{UserName: UserName, Page: Page}
-	return &us
+func (r *UserStockRequest) AssembleURL() string {
+	return fmt.Sprintf(qiitaUserStockURI, r.UserName, r.Page)
 }
 
-func (us *UserStockAPI) fetch(url string) ([]*Article, error) {
-	res, err := http.Get(url)
-	if err != nil {
-		return nil, fmt.Errorf("Unable to get (%s): %v", url, err)
-	} else if res.StatusCode != 200 {
-		return nil, fmt.Errorf("Unable to get (%s): http status %d", url, err)
-	}
-	defer res.Body.Close()
-
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return nil, fmt.Errorf("Unable to read response body (%s): %v", url, err)
-	}
-
-	var articlesFromApi []QiitaArticle
-	if err := json.Unmarshal(body, &articlesFromApi); err != nil {
-		return nil, fmt.Errorf("Unable to unmarshal response (%s): %v", url, err)
-
-	}
-	// Convert API data model to qiic domain model
-	var ret []*Article
-	for _, a := range articlesFromApi {
-		var tags []Tag
-		for _, t := range a.Tags {
-			tag := NewTag(t.Name)
-			tags = append(tags, tag)
-		}
-		article := NewArticle(a.ID, a.Title, tags, a.LikesCount, a.URL)
-		ret = append(ret, &article)
-	}
-
-	return ret, nil
-}
-
-// Fetch (HTTP Access)
-func (us *UserStockAPI) Fetch() ([]*Article, error) {
-	articles, err := us.fetch(fmt.Sprintf(qiitaUserStockURI, us.UserName, us.Page))
-	if err != nil {
-		return nil, err
-	}
-	return articles, nil
+func (r *UserStockRequest) SetAuthHeader(req *http.Request) {
+	// Do nothing
 }

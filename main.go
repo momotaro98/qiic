@@ -78,8 +78,13 @@ func main() {
 				username := ctx.String("username")
 				page := ctx.Int("page")
 				// Fetch from API Server
-				userStock := NewUserStockAPI(username, page)
-				articles, err := userStock.Fetch()
+				req := &UserStockRequest{
+					UserName: username,
+					GetRequest: GetRequest{
+						Page: page,
+					},
+				}
+				articles, _, err := GetArticles(req)
 				if err != nil {
 					return err
 				}
@@ -113,11 +118,13 @@ func main() {
 				token := ctx.String("token")
 				page := ctx.Int("page")
 				// Fetch from API Server
-				articles, err := GetAuthenticatedUserItems(
-					&ReqGetAuthenticatedUserItems{
+				req := &ReqGetAuthenticatedUserItems{
+					GetRequest{
 						Token: token,
 						Page:  page,
-					})
+					},
+				}
+				articles, _, err := GetArticles(req)
 				if err != nil {
 					return err
 				}
