@@ -1,4 +1,4 @@
-package main
+package qiic
 
 import (
 	"encoding/json"

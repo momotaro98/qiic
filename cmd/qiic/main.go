@@ -9,6 +9,8 @@ import (
 	"sync"
 
 	"github.com/urfave/cli"
+
+	"github.com/momotaro98/qiic"
 )
 
 const Version = "1.2.0"
@@ -32,7 +34,7 @@ func main() {
 				if err != nil {
 					return fmt.Errorf("Error! Argument is required to be number\nUsage Example: qiic a 3")
 				}
-				articles, err := Load()
+				articles, err := qiic.Load()
 				if err != nil {
 					return err
 				}
@@ -40,7 +42,7 @@ func main() {
 					return fmt.Errorf("Error! The argument number is out of range of the articles Access Number\nUsage Example: qiic a 3\nCheck Articles Number with\nqiic u\n  or\nqiic l")
 				}
 				targetArticle := articles[argAnum-1] // need decrement
-				err = OpenBrowser(targetArticle.URL)
+				err = qiic.OpenBrowser(targetArticle.URL)
 				if err != nil {
 					return err
 				}
@@ -52,11 +54,11 @@ func main() {
 			Aliases: []string{"l", "ls"},
 			Usage:   "list local saved articles",
 			Action: func(ctx *cli.Context) error {
-				articles, err := Load()
+				articles, err := qiic.Load()
 				if err != nil {
 					return err
 				}
-				Render(articles)
+				qiic.Render(articles)
 				return nil
 			},
 		},
@@ -82,21 +84,18 @@ func main() {
 				page := ctx.Int("page")
 
 				if username == "" {
-					msg := "username is required"
-					fmt.Println(msg)
-					return fmt.Errorf(msg)
+					return fmt.Errorf("username is required")
 				}
 
 				// Fetch from API Server
-				req := &UserStockRequest{
+				req := &qiic.UserStockRequest{
 					UserName: username,
-					GetRequest: GetRequest{
+					GetRequest: qiic.GetRequest{
 						Page: page,
 					},
 				}
-				articles, _, err := GetArticles(context.Background(), req)
+				articles, _, err := qiic.GetArticles(context.Background(), req)
 				if err != nil {
-					fmt.Println(err)
 					return err
 				}
 
@@ -133,31 +132,29 @@ func main() {
 
 				var (
 					c   = context.Background()
-					req ArticlesGetRequester
+					req qiic.ArticlesGetRequester
 				)
 
 				if token != "" {
-					c = SetToken(c, token)
-					req = &ReqGetAuthenticatedUserItems{
-						GetRequest{
+					c = qiic.SetToken(c, token)
+					req = &qiic.ReqGetAuthenticatedUserItems{
+						GetRequest: qiic.GetRequest{
 							Page: 1,
 						},
 					}
 				} else if username != "" {
-					c = SetUserName(context.Background(), username)
-					req = &ReqGetUserItems{
-						GetRequest{
+					c = qiic.SetUserName(context.Background(), username)
+					req = &qiic.ReqGetUserItems{
+						GetRequest: qiic.GetRequest{
 							Page: 1,
 						},
 					}
 				} else {
-					msg := "either token or username is required"
-					fmt.Println(msg)
-					return fmt.Errorf(msg)
+					return fmt.Errorf("either token or username is required")
 				}
 
 				// Fetch from API Server
-				articles, err := CollectUserItems(c, req)
+				articles, err := qiic.CollectUserItems(c, req)
 				if err != nil {
 					fmt.Println(err)
 					return err
@@ -173,7 +170,7 @@ func main() {
 				end := start + ArtPerPage
 				num := len(articles)
 				if num <= start {
-					articles = []*Article{}
+					articles = []*qiic.Article{}
 				} else if num < end {
 					articles = articles[start:num]
 				} else {
@@ -185,17 +182,19 @@ func main() {
 		},
 	}
 
-	app.Run(os.Args)
+	if err := app.Run(os.Args); err != nil {
+		fmt.Println(err)
+	}
 }
 
-func SaveAndRender(articles []*Article) error {
+func SaveAndRender(articles []*qiic.Article) error {
 	var wg sync.WaitGroup
 
 	// Save file
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		if err := Save(articles); err != nil {
+		if err := qiic.Save(articles); err != nil {
 			fmt.Println("saving a file for cache failed")
 		}
 	}()
@@ -204,7 +203,7 @@ func SaveAndRender(articles []*Article) error {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		Render(articles)
+		qiic.Render(articles)
 	}()
 
 	wg.Wait()
