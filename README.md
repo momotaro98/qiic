@@ -1,6 +1,6 @@
 # qiic
 
-qiic is unofficial command line tool to see Qiita articles data using its API.
+qiic is an unofficial CLI tool to see Qiita articles using its API.
 
 ![qiic_demo](https://github.com/momotaro98/my-project-images/blob/master/qiic/demo.gif)
 
@@ -16,17 +16,16 @@ qiic is unofficial command line tool to see Qiita articles data using its API.
 ### Option 1: Only for MacOS user, Homebrew
 
 ```
-$ brew tap momotaro98/qiic
-$ brew install momotaro98/qiic/qiic
+brew tap momotaro98/qiic
+brew install momotaro98/qiic/qiic
 ```
 
 ### Option 2: Go Get
-If you have installed go platform, executing `go get` command is easy to install.
 
-To install or update the qiic binary into your $GOPATH as usual, run:
+If you have `go` command, executing `go install` is also easy.
 
-```bash
-$ go get -u github.com/momotaro98/qiic/cmd/qiic
+```
+go install github.com/momotaro98/qiic/cmd/qiic@latest
 ```
 
 ## Setup
@@ -49,8 +48,8 @@ a | access | open   access the article page with your browser
 
 get your 20 updated Qiita stocked article
 
-```bash
-$ qiic s  # get your updated Qiita stocked articles and show them
+```
+qiic s  # get your updated Qiita stocked articles and show them
 ```
 
 You'll see the 15 articles' list from latest ones
@@ -77,16 +76,16 @@ Exmaple:
 You can open the article in your browser with Access Number(A No)
 with `qiic a [A No]`
 
-```bash
-$ qiic a 2  # Open the specified article (A No is 2) in your browser
+```
+qiic a 2  # Open the specified article (A No is 2) in your browser
 ```
 
 ### Page specifed update
 
 ```bash
-$ qiic rank -p 2
+qiic rank -p 2
 ```
 
 ## Development and Contribution
 
-Please check Makefile and you can create any issues and pull requests!
+Please check Makefile and you can create any issues and pull requests
